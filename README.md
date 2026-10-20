@@ -2,6 +2,13 @@
 
 Web app per imparare l'ungherese partendo dall'italiano, con Paprikina (una paprika) come mascotte.
 30 unità in 6 gruppi: spiegazioni in italiano, lessico a blocchi, esercizi sulla regola e frasi miste, ripasso degli errori.
+Tre sezioni, dalla barra in basso:
+- **Percorso**: 30 unità in 6 gruppi.
+- **Flashcard**: il lessico del corso (un mazzo per gruppo) più verbi irregolari, -ban/-ben, prefissi verbali, aggettivi opposti e Ungheria. Ripetizione a intervalli: «Lo so» → la carta torna dopo 1, 3, 7, 14, 30 giorni; «Non ancora» → torna nella stessa sessione e domani.
+- **Frasi**: frasario per situazione (saluti, ristorante, negozio, città…) da ascoltare e da ricomporre con le tessere.
+
+Il gesto «indietro» del telefono torna alla schermata precedente; nell'app installata su iPhone basta uno swipe dal bordo sinistro.
+
 Funziona nel browser, si installa sulla schermata Home e funziona anche offline.
 
 ## Contenuto

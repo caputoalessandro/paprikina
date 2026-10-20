@@ -346,6 +346,57 @@ body{background:var(--bg)}
 .grp.gdone .grp-h{background:var(--lion-soft)}
 .grp .unit:last-child{border-bottom:0}
 .unit.cur .num{background:var(--deep);border-color:var(--ink);color:#fff}
+
+/* barra delle sezioni */
+#app{padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:7;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface);border-top:3px solid var(--ink);
+  padding:8px max(12px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:2.5px solid transparent;border-radius:14px;padding:6px 4px 5px;font-size:13px;font-weight:700;color:var(--muted);max-width:180px;width:100%;justify-self:center;min-height:52px}
+.tab.on{color:var(--ink);background:var(--bg);border-color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+.tab .badge{position:absolute;top:-6px;right:calc(50% - 30px);min-width:22px;height:22px;padding:0 5px;border-radius:11px;background:var(--bad);color:#fff;border:2px solid var(--ink);font-style:normal;font-family:var(--f-mono);font-size:11px;line-height:18px;text-align:center}
+.swipe-back{position:fixed;left:-34px;top:45%;z-index:20;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:3px solid var(--ink);color:var(--ink);opacity:.6;pointer-events:none}
+.swipe-back.go{opacity:1;background:var(--bg)}
+
+/* intestazione delle sezioni con Paprikina */
+.next.sect{margin-bottom:24px}
+.next.sect h2{font-size:24px}
+.next-txt{display:grid;gap:6px}
+
+/* flashcard */
+.seg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.seg .chip{padding:8px 12px;font-size:12px}
+.chip.on{background:var(--deep);color:#fff}
+.decks{display:grid;gap:10px;margin-bottom:26px}
+.deck{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;text-align:left;width:100%;background:var(--surface);border:2.5px solid var(--ink);border-radius:18px;box-shadow:0 4px 0 var(--bg-shade);padding:14px 16px}
+.deck:active{transform:translateY(3px);box-shadow:0 1px 0 var(--bg-shade)}
+.deck.hasdue{border-left:10px solid var(--deep)}
+.dt{min-width:0;display:flex;flex-direction:column;gap:2px}
+.dt b{font-family:var(--f-display);font-size:19px;font-weight:800}
+.dt > span:not(.label){color:var(--muted);font-size:14px}
+.fc-wrap{position:relative;margin-top:10px}
+.fcard{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;min-height:260px;padding:28px 20px 40px;text-align:center;background:var(--surface);border:3px solid var(--ink);border-radius:24px;box-shadow:0 7px 0 var(--bg-shade);overflow-wrap:anywhere}
+.fcard .front{display:flex;flex-direction:column;align-items:center;gap:8px}
+.fcard .wd{font-family:var(--f-display);font-size:38px;font-weight:800;line-height:1.1}
+.fcard .wd.it{font-size:30px}
+.fcard .fq{color:var(--muted);font-size:15px}
+.fcard .backside{display:flex;flex-direction:column;align-items:center;gap:6px;border-top:3px dashed var(--ink);padding-top:14px;width:100%}
+.fcard .backside[hidden]{display:none}
+.fcard .backside b{font-family:var(--f-display);font-size:26px;font-weight:800}
+.fcard .backside b.good{color:var(--good)}
+.fcard .backside b.bad{color:var(--bad)}
+.fcard .fx{color:var(--ink);font-size:15px;max-width:34ch}
+.fcard.flipped{animation:flip .3s ease}
+@keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(14deg) scale(.98)}100%{transform:none}}
+.fc-pal{position:absolute;right:-6px;bottom:-30px;pointer-events:none;transform:rotate(8deg)}
+.fc-pal.react{animation:hop .5s ease-out}
+.fc-say{margin:44px auto 0}
+.dock-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* frasi */
+.phr{display:grid;gap:8px;padding:10px 0 14px}
+.ph{width:100%}
+.ph .pn2{font-size:13px;color:var(--ink);opacity:.75;margin-top:2px}
+.ptrain{margin:2px 0 12px}
 </style>
 
 <div id="app"></div>
@@ -4132,6 +4183,182 @@ if (typeof module !== "undefined") module.exports = UNIT;
 
 REGISTER_UNIT(UNIT);})();</script>
 <script>
+/* ---------- Flashcard: mazzi scritti a mano (il lessico del corso viene aggiunto dall'app) ---------- */
+// carta: [ungherese, italiano, dettaglio mostrato sul retro]
+const FLASH = [
+  {id:"irr", g:"Grammatica", t:"Verbi irregolari", s:"Presente (io, tu, lui · noi, voi, loro) e passato", cards:[
+    ["van", "essere, esserci", "vagyok, vagy, van · vagyunk, vagytok, vannak · passato: volt"],
+    ["megy", "andare", "megyek, mész, megy · megyünk, mentek, mennek · passato: ment"],
+    ["jön", "venire", "jövök, jössz, jön · jövünk, jöttök, jönnek · passato: jött"],
+    ["eszik", "mangiare", "eszem, eszel, eszik · eszünk, esztek, esznek · passato: evett"],
+    ["iszik", "bere", "iszom, iszol, iszik · iszunk, isztok, isznak · passato: ivott"],
+    ["tesz", "mettere", "teszek, teszel, tesz · teszünk, tesztek, tesznek · passato: tett"],
+    ["vesz", "comprare, prendere", "veszek, veszel, vesz · veszünk, vesztek, vesznek · passato: vett"],
+    ["visz", "portare (via)", "viszek, viszel, visz · viszünk, visztek, visznek · passato: vitt"],
+    ["hisz", "credere", "hiszek, hiszel, hisz · hiszünk, hisztek, hisznek · passato: hitt"],
+    ["alszik", "dormire", "alszom, alszol, alszik · alszunk, alszotok, alszanak · passato: aludt"],
+    ["fekszik", "essere sdraiato", "fekszem, fekszel, fekszik · fekszünk, fekszetek, feküsznek · passato: feküdt"],
+    ["lesz", "diventare (e futuro di «essere»)", "leszek, leszel, lesz · leszünk, lesztek, lesznek · passato: lett"]
+  ]},
+  {id:"ban", g:"Grammatica", t:"-ban o -ben?", s:"Armonia vocalica: dove si trova qualcosa", pick:["-ban", "-ben"],
+    rule:"Vocali posteriori (a, á, o, ó, u, ú) → ‑ban. Vocali anteriori (e, é, i, í, ö, ő, ü, ű) → ‑ben. Nelle parole miste conta l'ultima vocale non neutra.", cards:[
+    ["ház", "casa", "házban"], ["kert", "giardino", "kertben"], ["iskola", "scuola", "iskolában"],
+    ["szoba", "stanza", "szobában"], ["bolt", "negozio", "boltban"], ["étterem", "ristorante", "étteremben"],
+    ["mozi", "cinema", "moziban"], ["város", "città", "városban"], ["erdő", "bosco", "erdőben"],
+    ["konyha", "cucina", "konyhában"], ["bank", "banca", "bankban"], ["hotel", "albergo", "hotelben"],
+    ["szekrény", "armadio", "szekrényben"], ["táska", "borsa", "táskában"], ["könyv", "libro", "könyvben"],
+    ["víz", "acqua", "vízben"], ["Olaszország", "Italia", "Olaszországban"], ["Németország", "Germania", "Németországban"],
+    ["autó", "automobile", "autóban"], ["kórház", "ospedale", "kórházban"], ["fürdőszoba", "bagno", "fürdőszobában"],
+    ["utca", "strada", "utcában"], ["hűtő", "frigorifero", "hűtőben"], ["múzeum", "museo", "múzeumban"],
+    ["templom", "chiesa", "templomban"]
+  ]},
+  {id:"pre", g:"Grammatica", t:"Prefissi verbali", s:"be-, ki-, fel-, le-, el-, meg-… con un esempio", cards:[
+    ["bemegy", "entrare", "Bemegyek a boltba. · Entro nel negozio."],
+    ["kimegy", "uscire", "Kimegyek a kertbe. · Esco in giardino."],
+    ["felmegy", "salire", "Felmegyek a lépcsőn. · Salgo le scale."],
+    ["lemegy", "scendere", "Lemegyek a pincébe. · Scendo in cantina."],
+    ["elmegy", "andare via, partire", "Holnap elmegyek. · Domani parto."],
+    ["hazamegy", "andare a casa", "Este hazamegyek. · Stasera vado a casa."],
+    ["átmegy", "attraversare", "Átmegyek az úton. · Attraverso la strada."],
+    ["visszajön", "tornare", "Mikor jössz vissza? · Quando torni?"],
+    ["megérkezik", "arrivare", "Megérkezett a vonat. · Il treno è arrivato."],
+    ["megeszik", "mangiare (tutto)", "Megettem a levest. · Ho mangiato (tutta) la minestra."],
+    ["elolvas", "leggere (fino in fondo)", "Elolvastam a könyvet. · Ho letto il libro."],
+    ["megír", "scrivere (finire di scrivere)", "Megírtam a levelet. · Ho scritto la lettera."],
+    ["meghív", "invitare", "Meghívlak vacsorára. · Ti invito a cena."],
+    ["felhív", "telefonare", "Holnap felhívlak. · Domani ti chiamo."],
+    ["bekapcsol", "accendere", "Bekapcsolom a tévét. · Accendo la tv."],
+    ["kikapcsol", "spegnere", "Kikapcsolom a telefont. · Spengo il telefono."],
+    ["elfelejt", "dimenticare", "Elfelejtettem a nevét. · Ho dimenticato il suo nome."],
+    ["megtanul", "imparare", "Megtanulom ezt a szót. · Imparo questa parola."]
+  ]},
+  {id:"opp", g:"Grammatica", t:"Aggettivi opposti", s:"Impara le parole a coppie", cards:[
+    ["nagy", "grande", "contrario: kicsi (piccolo)"], ["jó", "buono", "contrario: rossz (cattivo)"],
+    ["új", "nuovo", "contrario: régi (vecchio, di una cosa)"], ["fiatal", "giovane", "contrario: öreg (vecchio, di una persona)"],
+    ["meleg", "caldo", "contrario: hideg (freddo)"], ["hosszú", "lungo", "contrario: rövid (corto)"],
+    ["magas", "alto", "contrario: alacsony (basso)"], ["drága", "caro", "contrario: olcsó (economico)"],
+    ["gyors", "veloce", "contrario: lassú (lento)"], ["könnyű", "leggero, facile", "contrario: nehéz (pesante, difficile)"],
+    ["szép", "bello", "contrario: csúnya (brutto)"], ["tiszta", "pulito", "contrario: piszkos (sporco)"],
+    ["nyitva", "aperto", "contrario: zárva (chiuso)"], ["közel", "vicino", "contrario: messze (lontano)"],
+    ["sok", "molto, tanto", "contrario: kevés (poco)"], ["világos", "chiaro", "contrario: sötét (scuro)"],
+    ["üres", "vuoto", "contrario: tele (pieno)"], ["korán", "presto", "contrario: későn (tardi)"],
+    ["gazdag", "ricco", "contrario: szegény (povero)"], ["boldog", "felice", "contrario: szomorú (triste)"]
+  ]},
+  {id:"hun", g:"Ungheria", t:"Magyarország", s:"Piatti, luoghi e usanze", cards:[
+    ["gulyás", "zuppa di manzo con paprika", "In Ungheria è una zuppa, non lo spezzatino."],
+    ["pörkölt", "spezzatino con paprika", "Quello che in Italia chiamiamo «gulasch»."],
+    ["lecsó", "peperonata con pomodoro", "Peperoni, pomodori e cipolla, a volte con salsiccia."],
+    ["lángos", "pasta lievitata fritta", "Classica con panna acida e formaggio grattugiato."],
+    ["kürtőskalács", "dolce a spirale cotto allo spiedo", "Ricoperto di zucchero, cannella o noci."],
+    ["pogácsa", "pasticcino salato", "Piccolo e rotondo, spesso al formaggio."],
+    ["Túró Rudi", "barretta di ricotta dolce al cioccolato", "Si trova nel banco frigo di ogni supermercato."],
+    ["pálinka", "acquavite di frutta", "Di albicocca, prugna, pera…"],
+    ["fröccs", "vino con acqua frizzante", "Il drink dell'estate ungherese."],
+    ["Duna", "Danubio", "Attraversa Budapest e divide Buda da Pest."],
+    ["Balaton", "il lago più grande dell'Europa centrale", "Il «mare» degli ungheresi."],
+    ["puszta", "la grande pianura", "La steppa dell'Ungheria orientale."],
+    ["forint", "la moneta ungherese", "Abbreviata in Ft o HUF."],
+    ["névnap", "onomastico", "Si festeggia quasi come il compleanno."],
+    ["Egészségedre!", "Salute! (brindisi)", "A chi dai del lei: Egészségére!"],
+    ["paprika", "peperone, e anche la spezia", "Dolce (édes) o piccante (csípős)."]
+  ]}
+];
+
+/* ---------- Frasi utili, per situazione ---------- */
+// frase: [ungherese, italiano, nota facoltativa]
+const PHRASES = [
+  {id:"saluti", t:"Saluti e presentazioni", s:"Per rompere il ghiaccio", p:[
+    ["Szia!", "Ciao!", "A una persona; a più persone: Sziasztok!"],
+    ["Jó reggelt!", "Buongiorno!", "Al mattino presto."],
+    ["Jó napot kívánok!", "Buongiorno!", "Formale, durante il giorno."],
+    ["Jó estét!", "Buonasera!"],
+    ["Jó éjszakát!", "Buonanotte!"],
+    ["Viszontlátásra!", "Arrivederci!"],
+    ["Hogy vagy?", "Come stai?"],
+    ["Köszönöm, jól. És te?", "Bene, grazie. E tu?"],
+    ["Mi a neved?", "Come ti chiami?"],
+    ["A nevem Marco.", "Mi chiamo Marco."],
+    ["Olasz vagyok, Rómából.", "Sono italiano, di Roma."],
+    ["Örülök, hogy megismerhetlek.", "Piacere di conoscerti."]
+  ]},
+  {id:"cortesia", t:"Cortesia", s:"Grazie, prego, scusi", p:[
+    ["Köszönöm szépen!", "Grazie mille!"],
+    ["Szívesen.", "Prego.", "Risposta a «grazie»."],
+    ["Tessék!", "Ecco! / Prego!", "Quando porgi qualcosa. Al telefono: «Pronto?»."],
+    ["Elnézést!", "Scusi!", "Per chiedere qualcosa o passare."],
+    ["Bocsánat!", "Scusa! / Chiedo scusa!"],
+    ["Semmi baj.", "Non fa niente."],
+    ["Legyen szíves!", "Per cortesia!", "Formale."],
+    ["Szabad ez a hely?", "È libero questo posto?"],
+    ["Gratulálok!", "Congratulazioni!"],
+    ["Boldog születésnapot!", "Buon compleanno!"]
+  ]},
+  {id:"capire", t:"Capire e farsi capire", s:"Quando l'ungherese va troppo veloce", p:[
+    ["Nem értem.", "Non capisco."],
+    ["Lassabban, legyen szíves.", "Più lentamente, per favore."],
+    ["Meg tudná ismételni?", "Può ripetere?"],
+    ["Beszél angolul?", "Parla inglese?"],
+    ["Csak egy kicsit beszélek magyarul.", "Parlo solo un po' di ungherese."],
+    ["Hogy mondják magyarul?", "Come si dice in ungherese?"],
+    ["Mit jelent ez a szó?", "Cosa significa questa parola?"],
+    ["Le tudná írni?", "Me lo può scrivere?"]
+  ]},
+  {id:"ristorante", t:"Al bar e al ristorante", s:"Ordinare, brindare, pagare", p:[
+    ["Kérek egy kávét.", "Vorrei un caffè."],
+    ["Egy asztalt kérek két személyre.", "Un tavolo per due persone, per favore."],
+    ["Kérem az étlapot!", "Il menù, per favore!"],
+    ["Mit ajánl?", "Cosa mi consiglia?"],
+    ["Vegetáriánus vagyok.", "Sono vegetariano."],
+    ["Egy pohár vizet kérek.", "Un bicchiere d'acqua, per favore."],
+    ["Jó étvágyat!", "Buon appetito!"],
+    ["Nagyon finom!", "Buonissimo!"],
+    ["Egészségedre!", "Salute!", "Brindisi a una persona a cui dai del tu."],
+    ["Fizetni szeretnék.", "Vorrei pagare."],
+    ["Kártyával lehet fizetni?", "Si può pagare con la carta?"]
+  ]},
+  {id:"negozio", t:"Al negozio", s:"Prezzi, taglie, cassa", p:[
+    ["Mennyibe kerül?", "Quanto costa?"],
+    ["Ez túl drága.", "Questo è troppo caro."],
+    ["Csak nézelődöm.", "Sto solo guardando."],
+    ["Van nagyobb méretben?", "Ce l'ha in una taglia più grande?"],
+    ["Ezt kérem.", "Prendo questo."],
+    ["Kérek egy szatyrot is.", "Vorrei anche un sacchetto."],
+    ["Hol van a pénztár?", "Dov'è la cassa?"],
+    ["Vasárnap is nyitva vannak?", "Siete aperti anche la domenica?"]
+  ]},
+  {id:"citta", t:"In città e in viaggio", s:"Strade, mezzi, biglietti", p:[
+    ["Elnézést, hol van az állomás?", "Scusi, dov'è la stazione?"],
+    ["Messze van?", "È lontano?"],
+    ["Egyenesen, aztán balra.", "Dritto, poi a sinistra."],
+    ["A második utca jobbra.", "La seconda strada a destra."],
+    ["Melyik busz megy a központba?", "Quale autobus va in centro?"],
+    ["Egy jegyet kérek Debrecenbe.", "Un biglietto per Debrecen, per favore."],
+    ["Mikor indul a vonat?", "Quando parte il treno?"],
+    ["Eltévedtem.", "Mi sono perso."],
+    ["Meg tudná mutatni a térképen?", "Me lo può mostrare sulla mappa?"]
+  ]},
+  {id:"amici", t:"Fare amicizia", s:"Chiacchiere e appuntamenti", p:[
+    ["Honnan jöttél?", "Da dove vieni?"],
+    ["Mivel foglalkozol?", "Che lavoro fai?"],
+    ["Mit csinálsz hétvégén?", "Cosa fai nel fine settimana?"],
+    ["Van kedved meginni egy kávét?", "Ti va di bere un caffè?"],
+    ["Mikor találkozunk?", "Quando ci vediamo?"],
+    ["Megadod a számodat?", "Mi dai il tuo numero?"],
+    ["Nagyon jól éreztem magam.", "Mi sono divertito molto."],
+    ["Majd beszélünk!", "Ci sentiamo!"]
+  ]},
+  {id:"emergenze", t:"Salute ed emergenze", s:"Speriamo di non usarle", p:[
+    ["Segítség!", "Aiuto!"],
+    ["Rosszul vagyok.", "Sto male."],
+    ["Fáj a fejem.", "Mi fa male la testa."],
+    ["Hívjon orvost!", "Chiami un medico!"],
+    ["Hol van a legközelebbi gyógyszertár?", "Dov'è la farmacia più vicina?"],
+    ["Elvesztettem a táskámat.", "Ho perso la mia borsa."],
+    ["Hívja a rendőrséget!", "Chiami la polizia!"]
+  ]}
+];
+</script>
+<script>
 (function(){
 const KEY = "paprikina.v1";
 const PER_SESSION = 10;     // esercizi di grammatica per sessione
@@ -4143,7 +4370,7 @@ const L = LOGIC;
 UNITS.forEach(u => { const n = NOTES[u.id]; if(n){ u.note = n.note; u.vlaams = n.vlaams; u.vocab = n.vocab; } const c = CORE[u.id]; u.core = c ? c.words : []; u.drills = c ? c.drills : []; });
 
 /* ---------- stato salvato ---------- */
-function fresh(){ return {xp:0, streak:0, last:null, best:{}, vbest:{}, vblk:{}, wrong:[], audio:true, voice:"auto", palette:"gulyas"}; }
+function fresh(){ return {xp:0, streak:0, last:null, best:{}, vbest:{}, vblk:{}, wrong:[], audio:true, voice:"auto", palette:"gulyas", fc:{}, fcdir:"hu", fr:{}}; }
 function load(){ try{ const r = localStorage.getItem(KEY); if(r) return Object.assign(fresh(), JSON.parse(r)); }catch(e){} return fresh(); }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 let S = load();
@@ -4166,7 +4393,10 @@ const ICON = {
   back:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
   x:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   sound:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>',
-  check:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>'
+  check:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>',
+  path:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg>',
+  cards:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="14" rx="2.5"/><path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3H19a2 2 0 0 1 2 2v10a2.5 2.5 0 0 1-2.5 2.5H16"/></svg>',
+  chat:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H10l-5 4v-4H4Z"/><path d="M8 9.5h8M8 12.5h5"/></svg>'
 };
 
 /* ---------- Paprikina, la mascotte (disegno originale) ---------- */
@@ -4292,36 +4522,74 @@ const PALETTES = [
 function applyPalette(){ try{ document.documentElement.setAttribute("data-palette", S.palette || "gulyas"); }catch(e){} }
 
 /* ---------- navigazione: il gesto "indietro" del telefono segue le schermate ---------- */
-// profondità: percorso 0 · unità e impostazioni 1 · esercizi e risultati 2
-const DEPTH = {home:0, settings:1, lesson:1, quiz:2, res:2};
-let curDepth = 0, fromPop = false, skipPop = null;
+// profondità: percorso 0 · sezioni (flashcard, frasi), unità e impostazioni 1 · sessione flashcard 2 · esercizi e risultati 3
+const DEPTH = {home:0, cards:1, frasi:1, settings:1, lesson:1, deck:2, quiz:3, res:3};
+// hdep[i] = profondità della voce i della cronologia dell'app; hpos = voce attuale.
+// Si conta quante voci esistono davvero, così "indietro" non esce mai dall'app saltando livelli (es. ripasso errori dalla home).
+let hpos = 0, hdep = [0], fromPop = false, skipPop = null;
 function screen(st){
   if(fromPop) return;                       // la schermata arriva dal gesto: la cronologia è già giusta
   const d = DEPTH[st.s];
+  let back = 0;
+  while(hpos - back > 0 && hdep[hpos - back - 1] >= d) back++;
   try{
-    if(d > curDepth) history.pushState(st, "");
-    else if(d === curDepth) history.replaceState(st, "");
-    else { skipPop = st; history.go(d - curDepth); }   // si torna indietro: allinea la cronologia
+    if(back){                                // si torna indietro: allinea la cronologia
+      hpos -= back; hdep.length = hpos + 1; hdep[hpos] = d;
+      skipPop = Object.assign({}, st, {_i:hpos}); history.go(-back);
+    } else if(hdep[hpos] < d){
+      hpos++; hdep.length = hpos + 1; hdep[hpos] = d;
+      history.pushState(Object.assign({}, st, {_i:hpos}), "");
+    } else { hdep[hpos] = d; history.replaceState(Object.assign({}, st, {_i:hpos}), ""); }
   }catch(e){}
-  curDepth = d;
+}
+// schermate "a metà" (esercizio, risultati, sessione di carte): col gesto si torna a quella da cui si era partiti
+function parentOf(st){
+  if(st.s === "deck") return {s:"cards"};
+  if(st.s !== "quiz" && st.s !== "res") return st;
+  if(st.from === "frasi") return {s:"frasi"};
+  return st.unit ? {s:"lesson", id:st.unit} : {s:"home"};
 }
 function showState(st){
   st = st || {s:"home"};
   if(st.s === "lesson" && unitById(st.id)) lesson(st.id);
   else if(st.s === "settings") settings();
-  else if((st.s === "quiz" || st.s === "res") && st.unit && unitById(st.unit)) lesson(st.unit);
+  else if(st.s === "cards") cards();
+  else if(st.s === "frasi") frasi();
   else home();
 }
 window.addEventListener("popstate", (e) => {
   if(skipPop){ const st = skipPop; skipPop = null; try{ history.replaceState(st, ""); }catch(err){} return; }
-  try{ if(TTS) TTS.cancel(); }catch(err){}
-  let st = e.state || {s:"home"};
-  if(st.s === "quiz" || st.s === "res") st = {s:"lesson", id:st.unit};   // un esercizio lasciato non si riprende a metà
+  stopAll();
+  const raw = e.state || {s:"home", _i:0};
+  hpos = raw._i || 0;
+  const st = parentOf(raw);
   fromPop = true;
   try{ showState(st); } finally { fromPop = false; }
-  curDepth = DEPTH[st.s] || 0;
-  if(st !== e.state){ try{ history.replaceState(st, ""); }catch(err){} }
+  hdep.length = hpos + 1; hdep[hpos] = DEPTH[st.s] || 0;
+  if(st !== raw){ try{ history.replaceState(Object.assign({}, st, {_i:hpos}), ""); }catch(err){} }
 });
+// iPhone, app installata: non c'è il gesto di sistema, quindi uno swipe dal bordo sinistro fa "indietro"
+(function edgeSwipe(){
+  let x0 = null, y0 = 0, arrow = null;
+  addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if(hpos > 0 && t.clientX < 24){ x0 = t.clientX; y0 = t.clientY; } else x0 = null;
+  }, {passive:true});
+  addEventListener("touchmove", (e) => {
+    if(x0 == null) return;
+    const t = e.touches[0], dx = t.clientX - x0;
+    if(Math.abs(t.clientY - y0) > 60){ x0 = null; if(arrow){ arrow.remove(); arrow = null; } return; }
+    if(!arrow){ arrow = document.createElement("div"); arrow.className = "swipe-back"; arrow.innerHTML = ICON.back; document.body.appendChild(arrow); }
+    arrow.style.transform = "translateX(" + Math.min(Math.max(dx, 0), 90) + "px)";
+    arrow.classList.toggle("go", dx > 70);
+  }, {passive:true});
+  addEventListener("touchend", (e) => {
+    if(x0 == null) return;
+    const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if(arrow){ arrow.remove(); arrow = null; }
+    if(dx > 70) history.back();
+  });
+})();
 
 /* ---------- HOME ---------- */
 const GROUPS = [
@@ -4402,6 +4670,7 @@ function home(){
       <span>Esercizi originali basati su <i>MagyarOK</i>, <i>Hungarian: An Essential Grammar</i>, <i>Colloquial Hungarian</i> e <i>Complete Hungarian</i>. Pronuncia: voce ungherese del tuo dispositivo.</span>
     </footer>
   </div>`);
+  v.appendChild(tabBar("home"));
   const path = v.querySelector("#path");
   GROUPS.forEach((g, gi) => {
     const ids = g.u.filter(id => unitById(id));
@@ -4569,9 +4838,9 @@ function grammarPicks(uid){
   const mixed = shuffle(u.items.map((it,i) => ({u:uid, i, it}))).slice(0, MIXED).sort((a,b) => RANK[a.it.t] - RANK[b.it.t]);
   return intro.concat(drills, mixed);   // prima la regola, poi le frasi che uniscono tutto
 }
-function begin(mode, unit, list, block){
-  screen({s:"quiz", unit});
-  R = {mode, unit, block, queue:list, pos:0, total:list.filter(c => !c.intro).length, first:0, xp:0};
+function begin(mode, unit, list, block, from){
+  screen({s:"quiz", unit, from});
+  R = {mode, unit, block, from, queue:list, pos:0, total:list.filter(c => !c.intro).length, first:0, xp:0};
   renderItem();
 }
 function startUnit(id){ begin("unit", id, grammarPicks(id)); }
@@ -4590,6 +4859,8 @@ function startReview(){
   if(!list.length){ S.wrong = []; save(); return home(); }
   begin("review", null, list);
 }
+// la X dell'esercizio riporta da dove si era partiti
+function leaveQuiz(){ stopAll(); if(R.from === "frasi") frasi(R.block); else if(R.unit) lesson(R.unit); else home(); }
 const keyOf = (cur) => (cur.v ? (cur.src === "core" ? "k:" : "v:") : cur.c ? "c:" : "") + cur.u + ":" + cur.i;
 
 const KIND = {vintro:"Parola nuova", mc:"Scegli la risposta", fill:"Completa la frase", order:"Componi la frase", tr:"Traduci con le tessere",
@@ -4653,7 +4924,7 @@ function renderItem(){
     else {
       words = L.tokens(it.a[0]);
       const have = new Set(words.map(w => w.toLowerCase()));
-      const pool = L.vocabWords(unitById(cur.u).vocab).filter(w => !have.has(w.toLowerCase()));
+      const pool = it.x ? [] : L.vocabWords(unitById(cur.u).vocab).filter(w => !have.has(w.toLowerCase()));
       extra = it.x || shuffle(pool).slice(0, Math.min(3, pool.length));
     }
     const toks = shuffle(words.concat(extra));
@@ -4679,7 +4950,7 @@ function renderItem(){
 
   R.locked = false;
   chk.onclick = () => check(it, getAnswer(), v);
-  v.querySelector("#quit").onclick = home;
+  v.querySelector("#quit").onclick = leaveQuiz;
   const qs = v.querySelector("#qs");
   if(qs) qs.onclick = () => play(it.say);
   mount(v);
@@ -4689,7 +4960,7 @@ function renderItem(){
 function topBar(){
   const p = R.pos / R.queue.length * 100;
   return `<div class="ex-top">
-      <button class="x" id="quit" aria-label="Esci dalla lezione">${ICON.x}</button>
+      <button class="x" id="quit" aria-label="Esci dall'esercizio">${ICON.x}</button>
       <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p)}"><i style="width:${p}%"></i></div>
       <span class="ex-count">${R.pos+1}/${R.queue.length}</span>
     </div>`;
@@ -4707,7 +4978,7 @@ function renderIntro(cur){
     <div class="dock"><div class="dock-in"><button class="btn btn-deep" id="nx">Continua</button></div></div>
     <div class="quiz-bg" aria-hidden="true">${mascot("happy", 240)}</div>
   </div>`);
-  v.querySelector("#quit").onclick = home;
+  v.querySelector("#quit").onclick = leaveQuiz;
   v.querySelector("#qs").onclick = () => play(it.say);
   v.querySelector("#nx").onclick = advance;
   mount(v);
@@ -4777,7 +5048,7 @@ function check(it, ans, v){
     if(!cur.retry){ R.first++; R.xp += 10; } else { R.xp += 5; }
     if(R.mode === "review" && !cur.retry) S.wrong = S.wrong.filter(k => k !== key);
   } else {
-    if(!S.wrong.includes(key)) S.wrong.push(key);
+    if(!cur.p && !S.wrong.includes(key)) S.wrong.push(key);
     if(!cur.retry) R.queue.push(Object.assign({}, cur, {retry:true}));
   }
   save();
@@ -4787,7 +5058,7 @@ function check(it, ans, v){
   const canPlay = hasAudio(dutch);
   const qbg = v.querySelector(".quiz-bg");
   if(qbg){ qbg.innerHTML = mascot(ok ? "cheer" : "sad", 240); qbg.classList.remove("react"); void qbg.offsetWidth; qbg.classList.add("react"); }
-  const dock = v.querySelector("#dock");
+  const dock = document.getElementById("dock");   // la barra in basso è fuori da v (vedi mount)
   dock.innerHTML = "";
   const cmp = compareHtml(cur, it, ans, ok, right);
   const fb = $(`<div class="fb ${ok ? "ok" : "no"} pop" role="status">
@@ -4811,8 +5082,9 @@ function advance(){
 }
 
 function finish(){
-  screen({s:"res", unit:R.unit});
+  screen({s:"res", unit:R.unit, from:R.from});
   const pct = Math.round(R.first / R.total * 100);
+  if(R.mode === "phr") S.fr[R.block] = Math.max(S.fr[R.block] || 0, pct);
   if(R.mode === "unit") S.best[R.unit] = Math.max(S.best[R.unit] || 0, pct);
   if(R.mode === "vocab"){
     const k = R.unit + ":" + R.block;
@@ -4827,9 +5099,9 @@ function finish(){
     S.last = t;
   }
   save();
-  const msg = pct >= 80 && R.mode === "vocab" ? "Parole memorizzate. Ora passa alla grammatica." : pct === 100 ? "Perfetto." : pct >= 80 ? "Ottimo lavoro." : pct >= 50 ? "Ci sei quasi. Un altro giro e la chiudi." : "Rileggi la spiegazione e riprova.";
+  const msg = pct >= 80 && R.mode === "phr" ? "Frasi pronte per la prossima chiacchierata." : pct >= 80 && R.mode === "vocab" ? "Parole memorizzate. Ora passa alla grammatica." : pct === 100 ? "Perfetto." : pct >= 80 ? "Ottimo lavoro." : pct >= 50 ? "Ci sei quasi. Un altro giro e la chiudi." : "Rileggi la spiegazione e riprova.";
   const pn = {vocab:1, unit:2}[R.mode];
-  const label = pn ? "Parte " + pn + " · " + PARTS[pn-1].title + (pn === 1 && blocksOf(R.unit).length > 1 ? " · blocco " + (R.block + 1) : "") + " · " + esc(unitById(R.unit).it) : "Ripasso errori";
+  const label = pn ? "Parte " + pn + " · " + PARTS[pn-1].title + (pn === 1 && blocksOf(R.unit).length > 1 ? " · blocco " + (R.block + 1) : "") + " · " + esc(unitById(R.unit).it) : R.mode === "phr" ? "Frasi · " + esc(phraseSet(R.block).t) : "Ripasso errori";
   const np = R.unit ? nextPart(R.unit) : null;
   const v = $(`<div class="res pop">
     ${mascot(pct >= 80 ? "cheer" : pct >= 50 ? "happy" : "sad", 130)}
@@ -4841,8 +5113,9 @@ function finish(){
       ${pn && pct >= 80 && unitDone(R.unit) && unitIndex(R.unit) < UNITS.length-1 ? `<button class="btn btn-lion" id="nextu">Prossima unità</button>` : ""}
       ${pn && pct >= 80 && !unitDone(R.unit) ? `<button class="btn btn-lion" id="nextp">${np === 1 ? "Vai al blocco " + (nextBlock(R.unit) + 1) : "Vai alla parte " + np + " · " + PARTS[np-1].title}</button>` : ""}
       ${pn ? `<button class="btn ${pct>=80 ? "btn-ghost" : "btn-lion"}" id="again">Rifai la parte ${pn}</button>` : ""}
-      ${S.wrong.length ? `<button class="btn btn-ghost" id="rv">Ripassa gli errori (${S.wrong.length})</button>` : ""}
-      <button class="btn btn-ghost" id="hm">Torna al percorso</button>
+      ${R.mode === "phr" ? `<button class="btn ${pct>=80 ? "btn-ghost" : "btn-lion"}" id="again">Rifai queste frasi</button>` : ""}
+      ${S.wrong.length && R.mode !== "phr" ? `<button class="btn btn-ghost" id="rv">Ripassa gli errori (${S.wrong.length})</button>` : ""}
+      <button class="btn btn-ghost" id="hm">${R.mode === "phr" ? "Torna alle frasi" : R.unit ? "Torna all'unità" : "Torna al percorso"}</button>
     </div>
   </div>`);
   const on = (id, fn) => { const b = v.querySelector(id); if(b) b.onclick = fn; };
@@ -4850,14 +5123,282 @@ function finish(){
   on("#nextu", () => lesson(UNITS[unitIndex(unit)+1].id));
   on("#nextp", () => PARTS[np-1].start(unit));
   const blk = R.block;
-  on("#again", () => pn === 1 ? startVocab(unit, blk) : PARTS[pn-1].start(unit));
+  const mode = R.mode;
+  on("#again", () => mode === "phr" ? startPhrases(blk) : pn === 1 ? startVocab(unit, blk) : PARTS[pn-1].start(unit));
   on("#rv", startReview);
-  on("#hm", home);
+  on("#hm", () => mode === "phr" ? frasi(blk) : unit ? lesson(unit) : home());
   mount(v);
 }
 
+/* ---------- barra delle sezioni in basso ---------- */
+function tabBar(active){
+  const due = dueCount();
+  const tabs = [["home", "Percorso", ICON.path, home], ["cards", "Flashcard", ICON.cards, cards], ["frasi", "Frasi", ICON.chat, frasi]];
+  const bar = $(`<nav class="tabbar" aria-label="Sezioni">${tabs.map(([id, l, ic]) => `<button class="tab ${id === active ? "on" : ""}" data-t="${id}" ${id === active ? 'aria-current="page"' : ""}>${ic}<span>${l}</span>${id === "cards" && due ? `<i class="badge" aria-label="${due} da ripassare">${due > 99 ? "99+" : due}</i>` : ""}</button>`).join("")}</nav>`);
+  bar.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+    if(b.dataset.t !== active) tabs.find(t => t[0] === b.dataset.t)[3]();
+    else window.scrollTo({top:0, behavior:"smooth"});
+  });
+  return bar;
+}
+// intestazione delle sezioni: Paprikina con il fumetto
+function sectionHero(mood, greet, label, title, sub, btn){
+  return `<section class="next sect">
+    <div class="hero-art">${CLOUD}<span class="bubble">${esc(greet)}</span>${mascot(mood, 104)}</div>
+    <div class="next-txt"><span class="label">${label}</span><h2>${title}</h2><p>${sub}</p></div>
+    ${btn || ""}
+  </section>`;
+}
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+
+/* ---------- FLASHCARD: ripetizione a intervalli ---------- */
+const INTERVALS = [0, 1, 3, 7, 14, 30];   // giorni prima di rivedere una carta, per livello
+const FC_MAX = 20, FC_NEW = 10;           // carte per sessione, di cui nuove
+let DECKS = null;
+// mazzi del lessico del corso (uno per gruppo di unità) + mazzi scritti a mano
+function decks(){
+  if(DECKS) return DECKS;
+  const course = GROUPS.map((g, gi) => {
+    const seen = new Set(), list = [];
+    g.u.forEach(id => { const u = unitById(id); (u && u.vocab || []).forEach(([hu, it]) => { if(!seen.has(hu)){ seen.add(hu); list.push([hu, it, "Unità " + (unitIndex(id) + 1)]); } }); });
+    return {id:"c" + (gi + 1), g:"Lessico del corso", t:g.t, s:"Le parole delle unità " + (gi * 5 + 1) + "–" + (gi * 5 + 5), cards:list};
+  });
+  DECKS = course.concat(FLASH);
+  DECKS.forEach(d => d.cards = d.cards.map(c => ({id:d.id + ":" + c[0], hu:c[0], it:c[1], x:c[2] || "", deck:d})));
+  return DECKS;
+}
+const deckById = (id) => decks().find(d => d.id === id);
+function addDays(n){ const d = new Date(); d.setDate(d.getDate() + n); return today(d); }
+const cardState = (c) => S.fc[c.id];
+const isDue = (c) => { const x = cardState(c); return !!x && x.d <= today(); };
+function deckStats(d){
+  let due = 0, fresh = 0, known = 0;
+  d.cards.forEach(c => { const x = cardState(c); if(!x) fresh++; else { if(x.d <= today()) due++; if(x.l >= 3) known++; } });
+  return {due, fresh, known, total:d.cards.length};
+}
+function dueCount(){ return decks().reduce((t, d) => t + d.cards.filter(isDue).length, 0); }
+const DIRS = [["hu", "Ungherese → italiano"], ["it", "Italiano → ungherese"], ["mix", "Misto"]];
+
+function cards(){
+  screen({s:"cards"});
+  const due = dueCount();
+  const groups = [];
+  decks().forEach(d => { let g = groups.find(x => x.t === d.g); if(!g) groups.push(g = {t:d.g, d:[]}); g.d.push(d); });
+  const v = $(`<div class="pop">
+    <div class="lesson-h"><span class="label">Ripetizione a intervalli</span><h2>Flashcard</h2></div>
+    ${sectionHero(due ? "wave" : "happy", due ? pick(["Ismételjünk!", "Gyerünk!", "Hajrá!"]) : pick(["Ügyes!", "Szuper!"]),
+      "Oggi", due ? due + (due === 1 ? " carta da ripassare" : " carte da ripassare") : "Niente da ripassare",
+      due ? "Le carte tornano dopo 1, 3, 7, 14 e 30 giorni: ripassale oggi e restano in memoria." : "Scegli un mazzo qui sotto per imparare parole nuove.",
+      due ? `<button class="btn btn-lion" id="all">Ripassa ${Math.min(due, FC_MAX)} carte</button>` : "")}
+    <div class="sec-h"><h3>Direzione</h3></div>
+    <div class="seg" role="group" aria-label="Direzione delle carte">${DIRS.map(([id, l]) => `<button class="chip ${S.fcdir === id ? "on" : ""}" data-dir="${id}" aria-pressed="${S.fcdir === id}">${l}</button>`).join("")}</div>
+    <div id="dk"></div>
+  </div>`);
+  const dk = v.querySelector("#dk");
+  groups.forEach(g => {
+    dk.appendChild($(`<div class="sec-h"><h3>${esc(g.t)}</h3></div>`));
+    const list = $(`<div class="decks"></div>`);
+    g.d.forEach(d => {
+      const st = deckStats(d);
+      const b = $(`<button class="deck">
+        <span class="dt"><b>${esc(d.t)}</b><span>${esc(d.s)}</span>
+          <span class="label">${st.due ? st.due + " da ripassare · " : ""}${st.fresh ? st.fresh + " nuove · " : ""}${st.known}/${st.total} imparate</span></span>
+        <span class="meter"><i style="width:${Math.round(st.known / st.total * 100)}%"></i></span>
+      </button>`);
+      if(st.due) b.classList.add("hasdue");
+      b.onclick = () => startDeck(d.id);
+      list.appendChild(b);
+    });
+    dk.appendChild(list);
+  });
+  v.querySelectorAll("[data-dir]").forEach(b => b.onclick = () => { S.fcdir = b.dataset.dir; save(); cards(); });
+  const all = v.querySelector("#all"); if(all) all.onclick = () => startDeck("all");
+  v.appendChild(tabBar("cards"));
+  mount(v);
+}
+
+let F = null;   // sessione di flashcard in corso
+function startDeck(id){
+  const pool = id === "all" ? decks().flatMap(d => d.cards) : deckById(id).cards;
+  const due = shuffle(pool.filter(isDue)).sort((a, b) => cardState(a).d < cardState(b).d ? -1 : 1).slice(0, FC_MAX);
+  const fresh = id === "all" ? [] : pool.filter(c => !cardState(c)).slice(0, Math.min(FC_NEW, FC_MAX - due.length));
+  let queue = shuffle(due.concat(fresh));
+  let extra = false;
+  if(!queue.length){ queue = shuffle(pool).slice(0, FC_MAX); extra = true; }   // tutto in pari: un giro di ripasso libero, senza toccare gli intervalli
+  F = {id, queue:queue.map(c => ({c, tries:0})), pos:0, known:0, total:queue.length, extra, flipped:false, rev:false};
+  screen({s:"deck", id});
+  renderCard();
+}
+function cardSide(c){
+  const d = c.deck;
+  if(d.pick) return "hu";
+  return S.fcdir === "mix" ? (Math.random() < .5 ? "hu" : "it") : S.fcdir;
+}
+function renderCard(){
+  const cur = F.queue[F.pos], c = cur.c, d = c.deck;
+  cur.side = cur.side || cardSide(c);
+  F.flipped = false;
+  const front = cur.side === "hu"
+    ? `<span class="wd">${esc(c.hu)}</span>${d.pick ? `<span class="fq">${esc(c.it)} · dove? «in…»</span>` : ""}`
+    : `<span class="wd it">${esc(c.it)}</span><span class="fq">Come si dice in ungherese?</span>`;
+  const title = F.id === "all" ? "Ripasso del giorno" : d.t;
+  const v = $(`<div>
+    <div class="ex-top">
+      <button class="x" id="quit" aria-label="Torna ai mazzi">${ICON.x}</button>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(F.pos / F.queue.length * 100)}"><i style="width:${F.pos / F.queue.length * 100}%"></i></div>
+      <span class="ex-count">${F.pos + 1}/${F.queue.length}</span>
+    </div>
+    <div class="pop">
+      <span class="label">${esc(title)}${F.extra ? " · ripasso libero" : ""}${cur.tries ? " · di nuovo" : !cardState(c) ? " · nuova" : ""}</span>
+      <div class="fc-wrap">
+        <button class="fcard" id="card" aria-label="Gira la carta">
+          <span class="front">${front}</span>
+          <span class="backside" hidden></span>
+          <span class="flip label">${d.pick ? "Scegli la desinenza" : "Tocca per girare"}</span>
+        </button>
+        <span class="fc-pal" id="pal">${mascot(cur.tries ? "sad" : "wave", 74)}</span>
+      </div>
+      ${cur.side === "hu" ? `<button class="chip fc-say" id="say">${ICON.sound} Ascolta</button>` : ""}
+    </div>
+    <div class="dock"><div class="dock-in" id="dock"></div></div>
+  </div>`);
+  const dock = v.querySelector("#dock");
+  const card = v.querySelector("#card");
+  const pal = (mood) => { const p = v.querySelector("#pal"); p.innerHTML = mascot(mood, 74); p.classList.remove("react"); void p.offsetWidth; p.classList.add("react"); };
+  const reveal = (ok) => {
+    if(F.flipped) return; F.flipped = true;
+    const back = card.querySelector(".backside");
+    if(d.pick){
+      back.innerHTML = `<b class="${ok ? "good" : "bad"}">${esc(c.x)}</b><span>${ok ? "Giusto!" : "Era " + esc(c.x.endsWith("ban") ? "-ban" : "-ben")}</span>${ok ? "" : `<span class="fx">${esc(d.rule)}</span>`}`;
+    } else {
+      back.innerHTML = cur.side === "hu" ? `<b>${esc(c.it)}</b>${c.x ? `<span class="fx">${esc(c.x)}</span>` : ""}`
+        : `<b>${esc(c.hu)}</b>${c.x ? `<span class="fx">${esc(c.x)}</span>` : ""}`;
+    }
+    back.hidden = false; card.classList.add("flipped");
+    card.querySelector(".flip").textContent = d.pick ? "" : "Lo sapevi?";
+    if(!v.querySelector("#say")){ const b = $(`<button class="chip fc-say" id="say">${ICON.sound} Ascolta</button>`); b.onclick = () => play(sayOf(c)); card.after(b); }
+    if(S.audio) play(sayOf(c), {fresh:true});
+    if(d.pick){
+      pal(ok ? "cheer" : "sad");
+      grade(ok);
+      dock.innerHTML = ""; const nx = $(`<button class="btn ${ok ? "btn-ok" : "btn-no"}" id="nx">Continua</button>`); nx.onclick = nextCard; dock.appendChild(nx);
+    } else {
+      pal("happy");
+      dock.innerHTML = `<div class="dock-row2"><button class="btn btn-no" id="no">Non ancora</button><button class="btn btn-ok" id="yes">Lo so</button></div>`;
+      dock.querySelector("#no").onclick = () => { grade(false); nextCard(); };
+      dock.querySelector("#yes").onclick = () => { grade(true); nextCard(); };
+    }
+  };
+  if(d.pick){
+    const right = c.x.endsWith("ban") ? "-ban" : "-ben";
+    dock.innerHTML = `<div class="dock-row2">${d.pick.map(o => `<button class="btn btn-ghost" data-o="${o}">${esc(o)}</button>`).join("")}</div>`;
+    dock.querySelectorAll("[data-o]").forEach(b => b.onclick = () => reveal(b.dataset.o === right));
+    card.onclick = () => {};
+  } else {
+    dock.innerHTML = `<button class="btn btn-deep" id="nx">Gira la carta</button>`;
+    dock.querySelector("#nx").onclick = () => reveal();
+    card.onclick = () => reveal();
+  }
+  const say = v.querySelector("#say"); if(say) say.onclick = () => play(sayOf(c));
+  v.querySelector("#quit").onclick = cards;
+  mount(v);
+  if(cur.side === "hu" && !cur.tries) play(sayOf(c), {fresh:true});
+}
+const sayOf = (c) => c.deck.pick ? c.x : c.hu.split("/")[0].trim();
+// "Lo so": livello +1 e la carta torna più avanti; "Non ancora": torna in questa sessione e domani
+function grade(ok){
+  const cur = F.queue[F.pos], c = cur.c;
+  if(ok && !cur.tries) F.known++;
+  if(!F.extra && !cur.tries){
+    const x = cardState(c) || {l:0};
+    const l = ok ? Math.min(x.l + 1, INTERVALS.length - 1) : 0;
+    S.fc[c.id] = {l, d:addDays(ok ? INTERVALS[l] : 1)};
+  }
+  if(!ok && cur.tries < 2) F.queue.push({c, tries:cur.tries + 1, side:cur.side});
+  if(!cur.tries){ S.xp += ok ? 2 : 1; }
+  save();
+}
+function nextCard(){
+  F.pos++;
+  if(F.pos < F.queue.length) return renderCard();
+  const t = today();
+  if(S.last !== t){ const y = new Date(); y.setDate(y.getDate() - 1); S.streak = (S.last === today(y)) ? S.streak + 1 : 1; S.last = t; save(); }
+  const pct = F.total ? Math.round(F.known / F.total * 100) : 0;
+  const left = F.id === "all" ? dueCount() : (() => { const st = deckStats(deckById(F.id)); return st.due + st.fresh; })();
+  const v = $(`<div class="res pop">
+    ${mascot(pct >= 80 ? "cheer" : pct >= 50 ? "happy" : "sad", 130)}
+    <span class="label">${esc(F.id === "all" ? "Ripasso del giorno" : deckById(F.id).t)}</span>
+    <div class="score">${F.known}<small>/${F.total}</small></div>
+    <p>${pct >= 80 ? "Carte al sicuro. Le rivedrai fra qualche giorno." : "Quelle che non sapevi tornano domani."}</p>
+    <span class="xpgain">${S.streak} ${S.streak === 1 ? "giorno" : "giorni"} di fila</span>
+    <div class="row">
+      ${left ? `<button class="btn btn-lion" id="more">Altre carte (${left})</button>` : ""}
+      <button class="btn ${left ? "btn-ghost" : "btn-lion"}" id="bk">Torna ai mazzi</button>
+    </div>
+  </div>`);
+  const id = F.id;
+  const more = v.querySelector("#more"); if(more) more.onclick = () => startDeck(id);
+  v.querySelector("#bk").onclick = cards;
+  mount(v);
+}
+
+/* ---------- FRASI: frasario per situazione, con allenamento a tessere ---------- */
+const phraseSet = (id) => PHRASES.find(p => p.id === id);
+let openPhr = new Set();
+function frasi(openId){
+  screen({s:"frasi"});
+  if(openId) openPhr.add(openId);
+  const v = $(`<div class="pop">
+    <div class="lesson-h"><span class="label">Frasario</span><h2>Frasi</h2></div>
+    ${sectionHero("wave", pick(["Beszélgessünk!", "Mondd utánam!", "Szia!"]), "Per parlare subito",
+      "Frasi pronte per ogni situazione", "Tocca una frase per sentirla (due volte: più lenta). Poi allenati a ricomporla con le tessere.")}
+    <div class="path" id="ph"></div>
+  </div>`);
+  const ph = v.querySelector("#ph");
+  PHRASES.forEach(set => {
+    const open = openPhr.has(set.id), best = S.fr[set.id] || 0;
+    const box = $(`<section class="grp ${open ? "open" : ""} ${best >= 80 ? "gdone" : ""}">
+      <button class="grp-h" aria-expanded="${open}">
+        <span class="grp-t"><b>${esc(set.t)}</b><span>${esc(set.s)}</span></span>
+        <span class="grp-r"><span class="grp-n">${best ? best + "%" : set.p.length + " frasi"}</span><span class="meter"><i style="width:${best}%"></i></span></span>
+        <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="grp-b">
+        <div class="phr">${set.p.map(([hu, it, n]) => `<button class="vw ph" data-say="${esc(hu)}"><span class="ico">${ICON.sound}</span><span class="w"><b>${esc(hu)}</b><span class="m">${esc(it)}</span>${n ? `<span class="pn2">${esc(n)}</span>` : ""}</span></button>`).join("")}</div>
+        <button class="btn btn-lion ptrain">Allenati con queste frasi</button>
+      </div>
+    </section>`);
+    box.querySelector(".grp-h").onclick = () => {
+      if(openPhr.has(set.id)) openPhr.delete(set.id); else openPhr.add(set.id);
+      box.classList.toggle("open"); box.querySelector(".grp-h").setAttribute("aria-expanded", openPhr.has(set.id));
+    };
+    box.querySelectorAll(".ph").forEach(b => b.onclick = () => play(b.dataset.say));
+    box.querySelector(".ptrain").onclick = () => startPhrases(set.id);
+    ph.appendChild(box);
+  });
+  v.appendChild(tabBar("frasi"));
+  mount(v);
+  if(openId){ const el = [...v.querySelectorAll(".grp")][PHRASES.findIndex(p => p.id === openId)]; if(el) try{ el.scrollIntoView({block:"start"}); }catch(e){} }
+}
+// ogni frase diventa un esercizio "traduci con le tessere"; distrattori presi dalle altre frasi della situazione
+function startPhrases(id){
+  const set = phraseSet(id);
+  const usable = set.p.map((p, i) => ({p, i})).filter(x => L.tokens(x.p[0]).length > 1);
+  const list = shuffle(usable).slice(0, 8).map(({p, i}) => {
+    const words = L.tokens(p[0]), have = new Set(words.map(w => w.toLowerCase()));
+    const pool = Array.from(new Set(set.p.flatMap(q => L.tokens(q[0])))).filter(w => !have.has(w.toLowerCase()));
+    return {u:null, i, p:true, it:{t:"tr", q:p[1], a:[p[0]], x:shuffle(pool).slice(0, 3), e:p[2] ? esc(p[2]) : "", say:p[0]}};
+  });
+  begin("phr", null, list, id, "frasi");
+}
+
 /* ---------- montaggio e tastiera ---------- */
-function mount(v){ app.innerHTML = ""; app.appendChild(v); window.scrollTo(0,0); }
+function mount(v){
+  app.innerHTML = ""; app.appendChild(v);
+  // barre fisse fuori dal contenitore animato, così non si spostano durante l'animazione
+  v.querySelectorAll(".dock, .tabbar").forEach(el => app.appendChild(el));
+  window.scrollTo(0,0);
+}
 document.addEventListener("keydown", e => {
   if(e.key !== "Enter") return;
   const nx = document.getElementById("nx"), chk = document.getElementById("chk");
@@ -4866,8 +5407,9 @@ document.addEventListener("keydown", e => {
 });
 
 applyPalette();
-try{ history.replaceState({s:"home"}, ""); }catch(e){}
-window.__paprikina = { get session(){ return R; } };  // usato solo dai test
+try{ history.replaceState({s:"home", _i:0}, ""); }catch(e){}
+window.__paprikina = { get session(){ return R; }, get cards(){ return F; } };  // usato solo dai test
+window.APP = {PALETTES};
 home();
 })();
 </script>
