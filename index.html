@@ -392,11 +392,22 @@ body{background:var(--bg)}
 .fc-say{margin:44px auto 0}
 .dock-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-/* frasi */
-.phr{display:grid;gap:8px;padding:10px 0 14px}
-.ph{width:100%}
-.ph .pn2{font-size:13px;color:var(--ink);opacity:.75;margin-top:2px}
-.ptrain{margin:2px 0 12px}
+/* frasi: ordine delle parole */
+.deck.wdone{background:var(--lion-soft)}
+.rulebtn{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--ink);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;margin:2px 0 6px}
+.rulebtn::before{content:"?";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--deep);color:#fff;font-size:12px}
+.rulebox{background:var(--surface);border:2.5px solid var(--ink);border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.5;margin-bottom:8px}
+.tok.lock{background:var(--lion-soft);border-style:dashed;cursor:default}
+.wdiag{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px;color:var(--ink);display:grid;gap:8px}
+.wpills{display:flex;flex-wrap:wrap;gap:6px}
+.wp{border:2px solid var(--ink);border-radius:8px;padding:3px 9px;font-size:15px;font-weight:700;background:var(--surface)}
+.wp.pv{background:var(--deep);color:#fff}
+.wp.pe{background:var(--lion-soft);box-shadow:inset 0 -4px 0 var(--deep)}
+.wleg{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.wl{display:inline-flex;align-items:center;gap:5px}
+.wl i{width:14px;height:14px;border:2px solid var(--ink);border-radius:4px;display:inline-block}
+.wl i.pv{background:var(--deep)}
+.wl i.pe{background:var(--lion-soft);box-shadow:inset 0 -3px 0 var(--deep)}
 </style>
 
 <div id="app"></div>
@@ -4264,98 +4275,128 @@ const FLASH = [
   ]}
 ];
 
-/* ---------- Frasi utili, per situazione ---------- */
-// frase: [ungherese, italiano, nota facoltativa]
-const PHRASES = [
-  {id:"saluti", t:"Saluti e presentazioni", s:"Per rompere il ghiaccio", p:[
-    ["Szia!", "Ciao!", "A una persona; a più persone: Sziasztok!"],
-    ["Jó reggelt!", "Buongiorno!", "Al mattino presto."],
-    ["Jó napot kívánok!", "Buongiorno!", "Formale, durante il giorno."],
-    ["Jó estét!", "Buonasera!"],
-    ["Jó éjszakát!", "Buonanotte!"],
-    ["Viszontlátásra!", "Arrivederci!"],
-    ["Hogy vagy?", "Come stai?"],
-    ["Köszönöm, jól. És te?", "Bene, grazie. E tu?"],
-    ["Mi a neved?", "Come ti chiami?"],
-    ["A nevem Marco.", "Mi chiamo Marco."],
-    ["Olasz vagyok, Rómából.", "Sono italiano, di Roma."],
-    ["Örülök, hogy megismerhetlek.", "Piacere di conoscerti."]
-  ]},
-  {id:"cortesia", t:"Cortesia", s:"Grazie, prego, scusi", p:[
-    ["Köszönöm szépen!", "Grazie mille!"],
-    ["Szívesen.", "Prego.", "Risposta a «grazie»."],
-    ["Tessék!", "Ecco! / Prego!", "Quando porgi qualcosa. Al telefono: «Pronto?»."],
-    ["Elnézést!", "Scusi!", "Per chiedere qualcosa o passare."],
-    ["Bocsánat!", "Scusa! / Chiedo scusa!"],
-    ["Semmi baj.", "Non fa niente."],
-    ["Legyen szíves!", "Per cortesia!", "Formale."],
-    ["Szabad ez a hely?", "È libero questo posto?"],
-    ["Gratulálok!", "Congratulazioni!"],
-    ["Boldog születésnapot!", "Buon compleanno!"]
-  ]},
-  {id:"capire", t:"Capire e farsi capire", s:"Quando l'ungherese va troppo veloce", p:[
-    ["Nem értem.", "Non capisco."],
-    ["Lassabban, legyen szíves.", "Più lentamente, per favore."],
-    ["Meg tudná ismételni?", "Può ripetere?"],
-    ["Beszél angolul?", "Parla inglese?"],
-    ["Csak egy kicsit beszélek magyarul.", "Parlo solo un po' di ungherese."],
-    ["Hogy mondják magyarul?", "Come si dice in ungherese?"],
-    ["Mit jelent ez a szó?", "Cosa significa questa parola?"],
-    ["Le tudná írni?", "Me lo può scrivere?"]
-  ]},
-  {id:"ristorante", t:"Al bar e al ristorante", s:"Ordinare, brindare, pagare", p:[
-    ["Kérek egy kávét.", "Vorrei un caffè."],
-    ["Egy asztalt kérek két személyre.", "Un tavolo per due persone, per favore."],
-    ["Kérem az étlapot!", "Il menù, per favore!"],
-    ["Mit ajánl?", "Cosa mi consiglia?"],
-    ["Vegetáriánus vagyok.", "Sono vegetariano."],
-    ["Egy pohár vizet kérek.", "Un bicchiere d'acqua, per favore."],
-    ["Jó étvágyat!", "Buon appetito!"],
-    ["Nagyon finom!", "Buonissimo!"],
-    ["Egészségedre!", "Salute!", "Brindisi a una persona a cui dai del tu."],
-    ["Fizetni szeretnék.", "Vorrei pagare."],
-    ["Kártyával lehet fizetni?", "Si può pagare con la carta?"]
-  ]},
-  {id:"negozio", t:"Al negozio", s:"Prezzi, taglie, cassa", p:[
-    ["Mennyibe kerül?", "Quanto costa?"],
-    ["Ez túl drága.", "Questo è troppo caro."],
-    ["Csak nézelődöm.", "Sto solo guardando."],
-    ["Van nagyobb méretben?", "Ce l'ha in una taglia più grande?"],
-    ["Ezt kérem.", "Prendo questo."],
-    ["Kérek egy szatyrot is.", "Vorrei anche un sacchetto."],
-    ["Hol van a pénztár?", "Dov'è la cassa?"],
-    ["Vasárnap is nyitva vannak?", "Siete aperti anche la domenica?"]
-  ]},
-  {id:"citta", t:"In città e in viaggio", s:"Strade, mezzi, biglietti", p:[
-    ["Elnézést, hol van az állomás?", "Scusi, dov'è la stazione?"],
-    ["Messze van?", "È lontano?"],
-    ["Egyenesen, aztán balra.", "Dritto, poi a sinistra."],
-    ["A második utca jobbra.", "La seconda strada a destra."],
-    ["Melyik busz megy a központba?", "Quale autobus va in centro?"],
-    ["Egy jegyet kérek Debrecenbe.", "Un biglietto per Debrecen, per favore."],
-    ["Mikor indul a vonat?", "Quando parte il treno?"],
-    ["Eltévedtem.", "Mi sono perso."],
-    ["Meg tudná mutatni a térképen?", "Me lo può mostrare sulla mappa?"]
-  ]},
-  {id:"amici", t:"Fare amicizia", s:"Chiacchiere e appuntamenti", p:[
-    ["Honnan jöttél?", "Da dove vieni?"],
-    ["Mivel foglalkozol?", "Che lavoro fai?"],
-    ["Mit csinálsz hétvégén?", "Cosa fai nel fine settimana?"],
-    ["Van kedved meginni egy kávét?", "Ti va di bere un caffè?"],
-    ["Mikor találkozunk?", "Quando ci vediamo?"],
-    ["Megadod a számodat?", "Mi dai il tuo numero?"],
-    ["Nagyon jól éreztem magam.", "Mi sono divertito molto."],
-    ["Majd beszélünk!", "Ci sentiamo!"]
-  ]},
-  {id:"emergenze", t:"Salute ed emergenze", s:"Speriamo di non usarle", p:[
-    ["Segítség!", "Aiuto!"],
-    ["Rosszul vagyok.", "Sto male."],
-    ["Fáj a fejem.", "Mi fa male la testa."],
-    ["Hívjon orvost!", "Chiami un medico!"],
-    ["Hol van a legközelebbi gyógyszertár?", "Dov'è la farmacia più vicina?"],
-    ["Elvesztettem a táskámat.", "Ho perso la mia borsa."],
-    ["Hívja a rendőrséget!", "Chiami la polizia!"]
-  ]}
+/* ---------- Frasi: ordine degli elementi nella frase (contenuti originali) ---------- */
+// a: blocchi nell'ordine giusto · alt: altri ordini corretti · start: blocchi iniziali già al loro posto
+// v: blocchi evidenziati come "verbo" (o etichetta lv del gruppo) · f: blocchi evidenziati come lf
+const ORDER_SETS = [
+  {
+    id: "np", unit: "u18",
+    t: "Prima il nome o dopo?", s: "Aggettivi, numeri e posposizioni",
+    lv: "nome", lf: "posposizione",
+    rule: `Aggettivi, numeri e possessore vanno <b>prima</b> del nome: <i>egy <b>nagy</b> ház</i>, <i><b>Péter</b> háza</i>. Dopo un numero il nome resta al singolare. Le posposizioni (<i>alatt, után, előtt</i>) vanno <b>dopo</b> il nome: <i>az asztal <b>alatt</b></i>.`,
+    items: [
+      { it: "una casa grande", a: ["egy","nagy","ház"], v: [2], f: [], e: "L'aggettivo <b>nagy</b> va prima del nome, al contrario dell'italiano." },
+      { it: "i due gatti neri", a: ["a","két","fekete","macska"], v: [3], f: [], e: "Articolo, numero, aggettivo, nome. Dopo <b>két</b> il nome resta singolare: <b>macska</b>." },
+      { it: "la mia macchina nuova", a: ["az","új","autóm"], v: [2], f: [], e: "Il possessivo è un suffisso (<b>autóm</b>); l'aggettivo sta prima." },
+      { it: "tre bicchieri di vino rosso", a: ["három","pohár","vörösbor"], v: [2], f: [], e: "Numero, contenitore, contenuto: <b>három pohár vörösbor</b>, senza «di»." },
+      { it: "un caffè molto forte", a: ["egy","nagyon","erős","kávé"], v: [3], f: [], e: "<b>nagyon</b> precede l'aggettivo, e tutto precede il nome." },
+      { it: "la casa grande di Péter", a: ["Péter","nagy","háza"], v: [2], f: [], e: "Prima il possessore (<b>Péter</b>), poi l'aggettivo, poi la cosa posseduta con il suffisso: <b>háza</b>." },
+      { it: "sotto il tavolo", a: ["az","asztal","alatt"], v: [1], f: [2], e: "<b>alatt</b> è una posposizione: va dopo il nome." },
+      { it: "dopo la lezione", a: ["az","óra","után"], v: [1], f: [2], e: "<b>után</b> (dopo) segue il nome." },
+      { it: "davanti alla stazione", a: ["az","állomás","előtt"], v: [1], f: [2], e: "<b>előtt</b> (davanti, prima) segue il nome." },
+      { it: "con la mia amica simpatica", a: ["a","kedves","barátnőmmel"], v: [2], f: [], e: "«con» è il suffisso <b>-mal/-mel</b> attaccato al nome; l'aggettivo resta prima." }
+    ]
+  },
+  {
+    id: "q", unit: "u9",
+    t: "Le domande", s: "La parola interrogativa prima del verbo",
+    lv: "verbo", lf: "parola interrogativa",
+    rule: `La parola interrogativa (<i>hol, mit, ki, mikor, hová, miért…</i>) va <b>subito prima del verbo</b>. Il resto può stare dopo il verbo o all'inizio della frase, ma niente si mette tra la parola interrogativa e il verbo.`,
+    items: [
+      { it: "Dove abita Anna?", a: ["Hol","lakik","Anna"], alt: [["Anna","hol","lakik"]], v: [1], f: [0], e: "<b>Hol lakik</b>: la parola interrogativa e il verbo stanno sempre attaccati." },
+      { it: "Cosa fai stasera?", a: ["Mit","csinálsz","ma este"], alt: [["Ma este","mit","csinálsz"]], v: [1], f: [0], e: "<b>Mit csinálsz</b>; <i>ma este</i> può andare in fondo o all'inizio." },
+      { it: "Chi viene alla festa?", a: ["Ki","jön","a buliba"], alt: [["A buliba","ki","jön"]], v: [1], f: [0], e: "<b>Ki jön</b>: «chi» è il soggetto, ma sta comunque subito prima del verbo." },
+      { it: "Quando parte il treno?", a: ["Mikor","indul","a vonat"], alt: [["A vonat","mikor","indul"]], v: [1], f: [0], e: "<b>Mikor indul</b>, poi il soggetto." },
+      { it: "Dove vai domani?", a: ["Hová","mész","holnap"], alt: [["Holnap","hová","mész"]], v: [1], f: [0], e: "<b>Hová mész</b>; il tempo può stare all'inizio o alla fine." },
+      { it: "Quanto costa questo pane?", a: ["Mennyibe","kerül","ez a kenyér"], alt: [["Ez a kenyér","mennyibe","kerül"]], v: [1], f: [0], e: "<b>Mennyibe kerül</b> è un blocco fisso: «quanto costa»." },
+      { it: "Perché studi l'ungherese?", a: ["Miért","tanulsz","magyarul"], alt: [["Magyarul","miért","tanulsz"]], v: [1], f: [0], e: "<b>Miért tanulsz</b>: nessuna parola tra «perché» e il verbo." },
+      { it: "Con chi parli al telefono?", a: ["Kivel","beszélsz","telefonon"], alt: [["Telefonon","kivel","beszélsz"]], v: [1], f: [0], e: "<b>Kivel</b> (con chi) è una parola interrogativa: subito prima del verbo." }
+    ]
+  },
+  {
+    id: "neg", unit: "u8",
+    t: "Dove va «nem»?", s: "Subito prima del verbo",
+    lv: "verbo", lf: "nem",
+    rule: `Per negare una frase, <b>nem</b> va <b>subito prima del verbo</b>: <i>Ma <b>nem</b> dolgozom</i>. Gli altri elementi possono stare prima di <i>nem</i> o dopo il verbo.`,
+    items: [
+      { it: "Oggi non lavoro.", a: ["Ma","nem","dolgozom"], alt: [["Nem","dolgozom","ma"]], v: [2], f: [1], e: "<b>nem dolgozom</b>: nem e il verbo vanno insieme." },
+      { it: "Non parlo tedesco.", a: ["Nem","beszélek","németül"], alt: [["Németül","nem","beszélek"]], v: [1], f: [0], e: "<b>Nem beszélek</b>, poi la lingua." },
+      { it: "Non sono stanco.", a: ["Nem","vagyok","fáradt"], alt: [["Fáradt","nem","vagyok"]], v: [1], f: [0], e: "Alla 3ª persona <i>van</i> sparisce, ma con «io» resta: <b>nem vagyok</b>." },
+      { it: "Non bevo caffè.", a: ["Nem","iszom","kávét"], alt: [["Kávét","nem","iszom"]], v: [1], f: [0], e: "<b>Nem iszom</b>; l'oggetto (all'accusativo) può andare dopo o all'inizio." },
+      { it: "Anna stasera non viene.", a: ["Anna","nem","jön","ma este"], alt: [["Anna","ma este","nem","jön"]], start: 1, v: [2], f: [1], e: "<b>nem jön</b>: tra nem e il verbo non entra niente." },
+      { it: "Non capisco la domanda.", a: ["Nem","értem","a kérdést"], alt: [["A kérdést","nem","értem"]], v: [1], f: [0], e: "<b>Nem értem</b> (coniugazione determinata, perché l'oggetto è definito)." },
+      { it: "Non abito a Budapest.", a: ["Nem","lakom","Budapesten"], alt: [["Budapesten","nem","lakom"], ["Nem","Budapesten","lakom"]], v: [1], f: [0], e: "<b>Nem lakom Budapesten</b>. (<i>Nem Budapesten lakom</i> = non è a Budapest che abito.)" },
+      { it: "Mio fratello non mangia carne.", a: ["A bátyám","nem","eszik","húst"], alt: [["A bátyám","húst","nem","eszik"]], start: 1, v: [2], f: [1], e: "<b>nem eszik</b>, poi l'oggetto <b>húst</b>." }
+    ]
+  },
+  {
+    id: "foc", unit: "u20",
+    t: "Il focus", s: "Ciò che conta va prima del verbo",
+    lv: "verbo", lf: "focus",
+    rule: `L'informazione importante o nuova (il <b>focus</b>) va <b>subito prima del verbo</b>. In italiano la sottolineiamo con la voce o con «è … che»; in ungherese basta la posizione: <i>Ma este <b>Péter</b> főz</i> = stasera cucina Péter (proprio lui). Quello che dici prima del focus è l'argomento di cui parli.`,
+    items: [
+      { it: "Péter cucina stasera (non domani).", a: ["Péter","ma este","főz"], alt: [["Ma este","főz","Péter"]], v: [2], f: [1], e: "Il focus è <b>ma este</b>: va subito prima di <b>főz</b>." },
+      { it: "Vado a Budapest in treno (non in macchina).", a: ["Vonattal","megyek","Budapestre"], alt: [["Budapestre","vonattal","megyek"]], v: [1], f: [0], e: "Focus <b>vonattal</b> (in treno) → subito prima di <b>megyek</b>." },
+      { it: "Ieri è stata Anna a chiamare.", a: ["Tegnap","Anna","hívott"], alt: [["Anna","hívott","tegnap"]], v: [2], f: [1], e: "È Anna, non un'altra persona: <b>Anna hívott</b>." },
+      { it: "Il pane lo compro al mercato (non al supermercato).", a: ["A kenyeret","a piacon","veszem"], alt: [["A piacon","veszem","a kenyeret"]], v: [2], f: [1], e: "Argomento <b>a kenyeret</b>, focus <b>a piacon</b>, poi il verbo." },
+      { it: "Domani lavoro a casa (non in ufficio).", a: ["Holnap","otthon","dolgozom"], alt: [["Otthon","dolgozom","holnap"]], v: [2], f: [1], e: "Il focus <b>otthon</b> sta attaccato al verbo." },
+      { it: "Il caffè lo bevo senza zucchero.", a: ["A kávét","cukor nélkül","iszom"], alt: [["Cukor nélkül","iszom","a kávét"]], v: [2], f: [1], e: "Focus <b>cukor nélkül</b> → <b>iszom</b>." },
+      { it: "Mia madre arriva alle sei (non alle cinque).", a: ["Anyám","hatkor","érkezik"], alt: [["Hatkor","érkezik","anyám"]], v: [2], f: [1], e: "L'ora è il focus: <b>hatkor érkezik</b>." },
+      { it: "Oggi pago io.", a: ["Ma","én","fizetek"], alt: [["Én","fizetek","ma"]], v: [2], f: [1], e: "Di solito il pronome si omette; se lo dici, è il focus e va prima del verbo: <b>én fizetek</b>." }
+    ]
+  },
+  {
+    id: "pre", unit: "u19",
+    t: "Il prefisso si stacca", s: "Dopo nem, domande e focus",
+    lv: "verbo", lf: "prefisso",
+    rule: `Nella frase neutra il prefisso è attaccato al verbo (<i><b>meg</b>írom</i>). Se prima del verbo c'è <b>nem</b>, una <b>parola interrogativa</b> o un <b>focus</b>, il prefisso si stacca e va <b>subito dopo il verbo</b>: <i>Mikor jössz <b>vissza</b>?</i>, <i>Nem ettem <b>meg</b>.</i>`,
+    items: [
+      { it: "Quando torni?", a: ["Mikor","jössz","vissza"], v: [1], f: [2], e: "<i>visszajön</i>: dopo <b>mikor</b> il prefisso va dopo il verbo." },
+      { it: "Chi è andato via?", a: ["Ki","ment","el"], v: [1], f: [2], e: "<i>elmegy</i> → <b>Ki ment el?</b>" },
+      { it: "Non entro nel negozio.", a: ["Nem","megyek","be","a boltba"], alt: [["A boltba","nem","megyek","be"]], v: [1], f: [2], e: "<i>bemegy</i> + nem → <b>nem megyek be</b>." },
+      { it: "Non ho mangiato la minestra.", a: ["Nem","ettem","meg","a levest"], alt: [["A levest","nem","ettem","meg"]], v: [1], f: [2], e: "<i>megeszik</i> + nem → <b>nem ettem meg</b>." },
+      { it: "Quando mi chiami?", a: ["Mikor","hívsz","fel"], v: [1], f: [2], e: "<i>felhív</i> → <b>Mikor hívsz fel?</b>" },
+      { it: "La lettera l'ho scritta ieri (non oggi).", a: ["A levelet","tegnap","írtam","meg"], alt: [["Tegnap","írtam","meg","a levelet"]], v: [2], f: [3], e: "Il focus <b>tegnap</b> occupa il posto del prefisso, che va dopo il verbo." },
+      { it: "Non accendo la tv.", a: ["Nem","kapcsolom","be","a tévét"], alt: [["A tévét","nem","kapcsolom","be"]], v: [1], f: [2], e: "<i>bekapcsol</i> + nem → <b>nem kapcsolom be</b>." },
+      { it: "Perché te ne vai?", a: ["Miért","mész","el"], v: [1], f: [2], e: "<i>elmegy</i> dopo <b>miért</b> → <b>mész el</b>." }
+    ]
+  },
+  {
+    id: "inf", unit: "u19",
+    t: "Prefisso e infinito", s: "Con akar, fog, kell, szeretne",
+    lv: "verbo coniugato", lf: "prima del verbo coniugato",
+    rule: `Con un verbo come <i>akar, fog, kell, szeretne</i> + infinito, il prefisso dell'infinito <b>sale davanti al verbo coniugato</b>: <i><b>Haza</b> akarok menni</i>, <i><b>Meg</b> fogom csinálni</i>. Se però c'è <b>nem</b>, è nem a stare davanti, e il prefisso resta sull'infinito: <i>Nem akarok <b>ki</b>menni</i>.`,
+    items: [
+      { it: "Voglio andare a casa.", a: ["Haza","akarok","menni"], v: [1], f: [0], e: "<i>hazamegy</i>: <b>haza</b> va davanti ad <b>akarok</b>." },
+      { it: "Domani voglio andare via.", a: ["Holnap","el","akarok","menni"], alt: [["El","akarok","menni","holnap"]], v: [2], f: [1], e: "<i>elmegy</i> → <b>el akarok menni</b>." },
+      { it: "Lo farò domani.", a: ["Holnap","meg","fogom","csinálni"], alt: [["Meg","fogom","csinálni","holnap"]], v: [2], f: [1], e: "Futuro con <i>fog</i>: <b>meg fogom csinálni</b>." },
+      { it: "Non voglio uscire.", a: ["Nem","akarok","kimenni"], v: [1], f: [0], e: "Con <b>nem</b> il prefisso resta attaccato all'infinito: <b>kimenni</b>." },
+      { it: "Devo chiamare il medico.", a: ["Fel","kell","hívnom","az orvost"], alt: [["Az orvost","fel","kell","hívnom"]], v: [1], f: [0], e: "<i>felhív</i> + kell → <b>fel kell hívnom</b>." },
+      { it: "Vorrei entrare.", a: ["Be","szeretnék","menni"], v: [1], f: [0], e: "<i>bemegy</i> + szeretnék → <b>be szeretnék menni</b>." },
+      { it: "Domani devo alzarmi presto.", a: ["Holnap","korán","kell","kelnem"], alt: [["Korán","kell","kelnem","holnap"]], v: [2], f: [1], e: "Qui davanti a <b>kell</b> va il focus <b>korán</b>." },
+      { it: "Imparerò l'ungherese.", a: ["Meg","fogok","tanulni","magyarul"], alt: [["Magyarul","meg","fogok","tanulni"]], v: [1], f: [0], e: "<i>megtanul</i> + fog → <b>meg fogok tanulni</b>." }
+    ]
+  },
+  {
+    id: "sem", unit: "u29",
+    t: "Senki, semmi, soha", s: "La doppia negazione",
+    lv: "verbo", lf: "nem / nincs",
+    rule: `Con <i>senki</i> (nessuno), <i>semmi</i> (niente), <i>soha</i> (mai), <i>sehová</i> (da nessuna parte) serve anche la negazione davanti al verbo: <i>Nem látok <b>senkit</b></i>, <i><b>Senki</b> nem jött</i>. Come in italiano «non vedo nessuno».`,
+    items: [
+      { it: "Non vedo nessuno.", a: ["Nem","látok","senkit"], alt: [["Senkit","nem","látok"]], v: [1], f: [0], e: "<b>Nem látok senkit</b>: doppia negazione, come in italiano." },
+      { it: "Non è venuto nessuno.", a: ["Senki","nem","jött"], alt: [["Nem","jött","senki"]], v: [2], f: [1], e: "Anche se <b>senki</b> è all'inizio, serve <b>nem</b> prima del verbo." },
+      { it: "Non mangio mai carne.", a: ["Soha","nem","eszem","húst"], alt: [["Húst","soha","nem","eszem"]], v: [2], f: [1], e: "<b>Soha nem eszem</b>: «mai» + nem + verbo." },
+      { it: "Non so niente.", a: ["Nem","tudok","semmit"], alt: [["Semmit","nem","tudok"]], v: [1], f: [0], e: "<b>semmit</b> è all'accusativo; il verbo resta indeterminato: <b>tudok</b>." },
+      { it: "Non vado da nessuna parte.", a: ["Nem","megyek","sehová"], alt: [["Sehová","nem","megyek"]], v: [1], f: [0], e: "<b>sehová</b> = da nessuna parte (moto a luogo)." },
+      { it: "Non ho mai visto Budapest.", a: ["Soha","nem","láttam","Budapestet"], alt: [["Budapestet","soha","nem","láttam"]], v: [2], f: [1], e: "<b>Soha nem láttam</b>, poi l'oggetto." },
+      { it: "Non ho chiamato nessuno.", a: ["Nem","hívtam","senkit"], alt: [["Senkit","nem","hívtam"]], v: [1], f: [0], e: "<b>Nem hívtam senkit</b>." },
+      { it: "Non c'è nessuno a casa.", a: ["Nincs","otthon","senki"], alt: [["Otthon","nincs","senki"], ["Senki","nincs","otthon"]], v: [], f: [0], e: "<b>nincs</b> = «non c'è»: già negativo, quindi niente <i>nem</i>." }
+    ]
+  }
+];
+const WO_GROUPS = [
+  ["La frase semplice", ["np", "q", "neg"]],
+  ["Il cuore dell'ungherese", ["foc", "pre", "inf", "sem"]]
 ];
 </script>
 <script>
@@ -4370,7 +4411,7 @@ const L = LOGIC;
 UNITS.forEach(u => { const n = NOTES[u.id]; if(n){ u.note = n.note; u.vlaams = n.vlaams; u.vocab = n.vocab; } const c = CORE[u.id]; u.core = c ? c.words : []; u.drills = c ? c.drills : []; });
 
 /* ---------- stato salvato ---------- */
-function fresh(){ return {xp:0, streak:0, last:null, best:{}, vbest:{}, vblk:{}, wrong:[], audio:true, voice:"auto", palette:"gulyas", fc:{}, fcdir:"hu", fr:{}}; }
+function fresh(){ return {xp:0, streak:0, last:null, best:{}, vbest:{}, vblk:{}, wrong:[], audio:true, voice:"auto", palette:"gulyas", fc:{}, fcdir:"hu", wob:{}}; }
 function load(){ try{ const r = localStorage.getItem(KEY); if(r) return Object.assign(fresh(), JSON.parse(r)); }catch(e){} return fresh(); }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 let S = load();
@@ -4836,7 +4877,10 @@ function grammarPicks(uid){
   const intro = (u.core || []).map((w,i) => ({u:uid, i, v:true, src:"core", intro:true, it:vocabItem(uid, i, "vintro", "core")}));
   const drills = shuffle(u.drills.map((it,i) => ({u:uid, i, c:true, it}))).slice(0, DRILLS).sort((a,b) => RANK[a.it.t] - RANK[b.it.t]);
   const mixed = shuffle(u.items.map((it,i) => ({u:uid, i, it}))).slice(0, MIXED).sort((a,b) => RANK[a.it.t] - RANK[b.it.t]);
-  return intro.concat(drills, mixed);   // prima la regola, poi le frasi che uniscono tutto
+  // 2 frasi da mettere in ordine, dalle serie della sezione Frasi collegate a questa unità
+  const wo = shuffle([].concat(...ORDER_SETS.filter(st => st.unit === uid).map(st => st.items.map((x, i) => ({set:st.id, i}))))).slice(0, 2)
+    .map(r => ({set:r.set, i:r.i, w:true, it:woItem(r.set, r.i)}));
+  return intro.concat(drills, wo, mixed);   // prima la regola, poi le frasi che uniscono tutto
 }
 function begin(mode, unit, list, block, from){
   screen({s:"quiz", unit, from});
@@ -4853,6 +4897,7 @@ function startReview(){
   const list = shuffle(S.wrong).slice(0, 12).map(k => {
     const p = k.split(":");
     if(p[0] === "v" || p[0] === "k"){ const src = p[0] === "k" ? "core" : "vocab"; return listOf(p[1], src)[+p[2]] ? {u:p[1], i:+p[2], v:true, src, it:vocabItem(p[1], +p[2], null, src)} : null; }
+    if(p[0] === "w"){ const st = ORDER_SETS.find(x => x.id === p[1]); return st && st.items[+p[2]] ? {set:p[1], i:+p[2], w:true, it:woItem(p[1], +p[2])} : null; }
     if(p[0] === "c"){ const un = unitById(p[1]); return un && un.drills[+p[2]] ? {u:p[1], i:+p[2], c:true, it:un.drills[+p[2]]} : null; }
     const un = unitById(p[0]); return un && un.items[+p[1]] ? {u:p[0], i:+p[1], it:un.items[+p[1]]} : null;
   }).filter(Boolean);
@@ -4860,17 +4905,17 @@ function startReview(){
   begin("review", null, list);
 }
 // la X dell'esercizio riporta da dove si era partiti
-function leaveQuiz(){ stopAll(); if(R.from === "frasi") frasi(R.block); else if(R.unit) lesson(R.unit); else home(); }
-const keyOf = (cur) => (cur.v ? (cur.src === "core" ? "k:" : "v:") : cur.c ? "c:" : "") + cur.u + ":" + cur.i;
+function leaveQuiz(){ stopAll(); if(R.from === "frasi") frasi(); else if(R.unit) lesson(R.unit); else home(); }
+const keyOf = (cur) => cur.w ? "w:" + cur.set + ":" + cur.i : (cur.v ? (cur.src === "core" ? "k:" : "v:") : cur.c ? "c:" : "") + cur.u + ":" + cur.i;
 
-const KIND = {vintro:"Parola nuova", mc:"Scegli la risposta", fill:"Completa la frase", order:"Componi la frase", tr:"Traduci con le tessere",
+const KIND = {wo:"Metti in ordine", vintro:"Parola nuova", mc:"Scegli la risposta", fill:"Completa la frase", order:"Componi la frase", tr:"Traduci con le tessere",
   vnl:"Cosa significa?", vit:"Come si dice in ungherese?", vlisten:"Ascolta e scegli"};
 
 function renderItem(){
   const cur = R.queue[R.pos];
   const it = cur.it;
   if(it.t === "vintro") return renderIntro(cur);
-  const kind = it.t === "vmc" ? it.kind : it.t;
+  const kind = it.t === "vmc" ? it.kind : it.wo ? "wo" : it.t;
   let qHtml;
   if(it.t === "vmc"){
     if(it.kind === "vnl") qHtml = `<div class="bigword"><span class="wd">${esc(it.word)}</span><button class="qsay" id="qs" aria-label="Ascolta">${ICON.sound}</button></div>`;
@@ -4885,6 +4930,7 @@ function renderItem(){
       <span class="label">${cur.retry ? "Riprova · " : ""}${KIND[kind]}</span>
       ${qHtml}
       ${it.h ? `<span class="hint">${esc(it.h)}</span>` : ""}
+      ${it.wo ? `<button class="rulebtn" id="rb" aria-expanded="false">Regola · ${esc(it.setTitle)}</button><div class="rulebox" id="rbox" hidden>${it.rule}</div>` : ""}
       <div id="area"></div>
     </div>
     <div class="dock"><div class="dock-in" id="dock"><button class="btn btn-deep" id="chk" disabled>Controlla</button></div></div>
@@ -4918,17 +4964,21 @@ function renderItem(){
     setTimeout(() => { try{ f.focus({preventScroll:true}); }catch(e){} }, 50);
     getAnswer = () => f.value;
   } else {
-    // order e tr: tessere da comporre
-    let words, extra;
-    if(it.t === "order"){ words = it.a.split(" "); extra = it.x || []; }
+    // order e tr: tessere da comporre (nelle Frasi le tessere sono blocchi, i primi possono essere già al loro posto)
+    let words, extra, lockN = 0;
+    if(it.t === "order" && Array.isArray(it.a)){ lockN = it.start || 0; words = it.a.slice(0, lockN).concat(it.tiles.slice(lockN)); extra = []; }
+    else if(it.t === "order"){ words = it.a.split(" "); extra = it.x || []; }
     else {
       words = L.tokens(it.a[0]);
       const have = new Set(words.map(w => w.toLowerCase()));
       const pool = it.x ? [] : L.vocabWords(unitById(cur.u).vocab).filter(w => !have.has(w.toLowerCase()));
       extra = it.x || shuffle(pool).slice(0, Math.min(3, pool.length));
     }
-    const toks = shuffle(words.concat(extra));
+    const locked = words.slice(0, lockN), free = words.slice(lockN);
+    let toks = shuffle(free.concat(extra));
+    for(let t = 0; t < 6 && toks.length > 2 && toks.join("|") === free.join("|"); t++) toks = shuffle(toks);   // mai già in ordine
     const slot = $(`<div class="slot" aria-label="La tua frase"></div>`);
+    locked.forEach(w => slot.appendChild($(`<span class="tok lock" title="Già al suo posto">${esc(w)}</span>`)));
     const bank = $(`<div class="bank"></div>`);
     const picked = [];
     toks.forEach(w => {
@@ -4945,9 +4995,11 @@ function renderItem(){
       bank.appendChild(b);
     });
     area.append(slot, bank);
-    getAnswer = () => picked.map(p => p.w).join(" ");
+    getAnswer = () => locked.concat(picked.map(p => p.w)).join(" ");
   }
 
+  const rb = v.querySelector("#rb");
+  if(rb) rb.onclick = () => { const bx = v.querySelector("#rbox"); bx.hidden = !bx.hidden; rb.setAttribute("aria-expanded", !bx.hidden); };
   R.locked = false;
   chk.onclick = () => check(it, getAnswer(), v);
   v.querySelector("#quit").onclick = leaveQuiz;
@@ -5012,8 +5064,8 @@ function compareHtml(cur, it, ans, ok, right){
     if(!ok){ out += row("bad", "La tua risposta", ans || "(vuota)", ""); out += row("good", "Giusta", right, ""); }
     trans = G.t;
   } else {   // order, tr: la domanda è già la frase italiana
-    if(!ok){ out += row("bad", "La tua frase", ans || "(vuota)", ""); out += row("good", "Giusta", right, ""); }
-    trans = it.q;
+    if(!ok){ out += row("bad", "La tua frase", ans || "(vuota)", ""); if(!it.wo) out += row("good", "Giusta", right, ""); }
+    trans = it.wo ? null : it.q;
   }
   if(trans) out += `<div class="tr-it"><span class="cl">Traduzione</span> ${esc(trans)}</div>`;
   return out;
@@ -5023,7 +5075,7 @@ function isCorrect(it, ans){
   if(ans == null) return false;
   if(it.t === "vmc") return ans === it.right;
   if(it.t === "mc") return ans === it.o[it.a];
-  if(it.t === "order") return [it.a].concat(it.alt || []).some(x => norm(x) === norm(ans));
+  if(it.t === "order") return [it.a].concat(it.alt || []).some(x => norm(Array.isArray(x) ? x.join(" ") : x) === norm(ans));
   // se la risposta attesa contiene accenti, apostrofi o trattini, vanno scritti anche da chi risponde
   const strict = (x) => String(x).toLowerCase().replace(/[’‘`´]/g,"'").replace(/[.,!?;:"“”]/g," ").replace(/\s+/g," ").trim();
   return it.a.some(a => /[^\x00-\x7F]|['’-]/.test(a) ? strict(a) === strict(ans) : norm(a) === norm(ans));   // fill e tr
@@ -5048,12 +5100,12 @@ function check(it, ans, v){
     if(!cur.retry){ R.first++; R.xp += 10; } else { R.xp += 5; }
     if(R.mode === "review" && !cur.retry) S.wrong = S.wrong.filter(k => k !== key);
   } else {
-    if(!cur.p && !S.wrong.includes(key)) S.wrong.push(key);
+    if(!S.wrong.includes(key)) S.wrong.push(key);
     if(!cur.retry) R.queue.push(Object.assign({}, cur, {retry:true}));
   }
   save();
 
-  const right = it.t === "vmc" ? it.right : it.t === "mc" ? it.o[it.a] : it.t === "order" ? it.a : it.a[0];
+  const right = it.t === "vmc" ? it.right : it.t === "mc" ? it.o[it.a] : it.t === "order" ? (Array.isArray(it.a) ? it.a.join(" ") : it.a) : it.a[0];
   const dutch = it.t === "vmc" ? it.say : L.dutchOf(it);
   const canPlay = hasAudio(dutch);
   const qbg = v.querySelector(".quiz-bg");
@@ -5064,6 +5116,7 @@ function check(it, ans, v){
   const fb = $(`<div class="fb ${ok ? "ok" : "no"} pop" role="status">
     <h3><span class="fbm">${mascot(ok ? "happy" : "sad", 40)}</span>${ok ? "Ügyes!" : "Nem egészen"}${canPlay ? `<button class="say" aria-label="Ascolta (tocca di nuovo per la versione lenta)">${ICON.sound}</button>` : ""}</h3>
     ${cmp}
+    ${it.wo ? woDiagram(it) : ""}
     ${it.t === "vmc" && !ok ? "" : `<div class="ex">${it.e || ""}</div>`}
   </div>`);
   const next = $(`<button class="btn ${ok ? "btn-ok" : "btn-no"}" id="nx">Continua</button>`);
@@ -5083,8 +5136,8 @@ function advance(){
 
 function finish(){
   screen({s:"res", unit:R.unit, from:R.from});
+  if(R.mode === "wo") return woFinish();
   const pct = Math.round(R.first / R.total * 100);
-  if(R.mode === "phr") S.fr[R.block] = Math.max(S.fr[R.block] || 0, pct);
   if(R.mode === "unit") S.best[R.unit] = Math.max(S.best[R.unit] || 0, pct);
   if(R.mode === "vocab"){
     const k = R.unit + ":" + R.block;
@@ -5099,9 +5152,9 @@ function finish(){
     S.last = t;
   }
   save();
-  const msg = pct >= 80 && R.mode === "phr" ? "Frasi pronte per la prossima chiacchierata." : pct >= 80 && R.mode === "vocab" ? "Parole memorizzate. Ora passa alla grammatica." : pct === 100 ? "Perfetto." : pct >= 80 ? "Ottimo lavoro." : pct >= 50 ? "Ci sei quasi. Un altro giro e la chiudi." : "Rileggi la spiegazione e riprova.";
+  const msg = pct >= 80 && R.mode === "vocab" ? "Parole memorizzate. Ora passa alla grammatica." : pct === 100 ? "Perfetto." : pct >= 80 ? "Ottimo lavoro." : pct >= 50 ? "Ci sei quasi. Un altro giro e la chiudi." : "Rileggi la spiegazione e riprova.";
   const pn = {vocab:1, unit:2}[R.mode];
-  const label = pn ? "Parte " + pn + " · " + PARTS[pn-1].title + (pn === 1 && blocksOf(R.unit).length > 1 ? " · blocco " + (R.block + 1) : "") + " · " + esc(unitById(R.unit).it) : R.mode === "phr" ? "Frasi · " + esc(phraseSet(R.block).t) : "Ripasso errori";
+  const label = pn ? "Parte " + pn + " · " + PARTS[pn-1].title + (pn === 1 && blocksOf(R.unit).length > 1 ? " · blocco " + (R.block + 1) : "") + " · " + esc(unitById(R.unit).it) : "Ripasso errori";
   const np = R.unit ? nextPart(R.unit) : null;
   const v = $(`<div class="res pop">
     ${mascot(pct >= 80 ? "cheer" : pct >= 50 ? "happy" : "sad", 130)}
@@ -5113,9 +5166,8 @@ function finish(){
       ${pn && pct >= 80 && unitDone(R.unit) && unitIndex(R.unit) < UNITS.length-1 ? `<button class="btn btn-lion" id="nextu">Prossima unità</button>` : ""}
       ${pn && pct >= 80 && !unitDone(R.unit) ? `<button class="btn btn-lion" id="nextp">${np === 1 ? "Vai al blocco " + (nextBlock(R.unit) + 1) : "Vai alla parte " + np + " · " + PARTS[np-1].title}</button>` : ""}
       ${pn ? `<button class="btn ${pct>=80 ? "btn-ghost" : "btn-lion"}" id="again">Rifai la parte ${pn}</button>` : ""}
-      ${R.mode === "phr" ? `<button class="btn ${pct>=80 ? "btn-ghost" : "btn-lion"}" id="again">Rifai queste frasi</button>` : ""}
-      ${S.wrong.length && R.mode !== "phr" ? `<button class="btn btn-ghost" id="rv">Ripassa gli errori (${S.wrong.length})</button>` : ""}
-      <button class="btn btn-ghost" id="hm">${R.mode === "phr" ? "Torna alle frasi" : R.unit ? "Torna all'unità" : "Torna al percorso"}</button>
+      ${S.wrong.length ? `<button class="btn btn-ghost" id="rv">Ripassa gli errori (${S.wrong.length})</button>` : ""}
+      <button class="btn btn-ghost" id="hm">${R.unit ? "Torna all'unità" : "Torna al percorso"}</button>
     </div>
   </div>`);
   const on = (id, fn) => { const b = v.querySelector(id); if(b) b.onclick = fn; };
@@ -5123,10 +5175,9 @@ function finish(){
   on("#nextu", () => lesson(UNITS[unitIndex(unit)+1].id));
   on("#nextp", () => PARTS[np-1].start(unit));
   const blk = R.block;
-  const mode = R.mode;
-  on("#again", () => mode === "phr" ? startPhrases(blk) : pn === 1 ? startVocab(unit, blk) : PARTS[pn-1].start(unit));
+  on("#again", () => pn === 1 ? startVocab(unit, blk) : PARTS[pn-1].start(unit));
   on("#rv", startReview);
-  on("#hm", () => mode === "phr" ? frasi(blk) : unit ? lesson(unit) : home());
+  on("#hm", () => unit ? lesson(unit) : home());
   mount(v);
 }
 
@@ -5342,54 +5393,100 @@ function nextCard(){
   mount(v);
 }
 
-/* ---------- FRASI: frasario per situazione, con allenamento a tessere ---------- */
-const phraseSet = (id) => PHRASES.find(p => p.id === id);
-let openPhr = new Set();
-function frasi(openId){
+/* ---------- FRASI: l'ordine degli elementi nella frase, con tessere a blocchi ---------- */
+// parole che restano maiuscole anche a metà frase (nomi propri): ricavate dai dati
+let PROPER = null;
+function properWords(){
+  if(PROPER) return PROPER;
+  PROPER = new Set();
+  ORDER_SETS.forEach(st => st.items.forEach(x => [x.a].concat(x.alt || []).forEach(seq => seq.forEach((c, k) => {
+    c.split(" ").forEach((w, j) => { if((k > 0 || j > 0) && /^[A-ZÁÉÍÓÖŐÚÜŰ]/.test(w)) PROPER.add(w); });
+  }))));
+  return PROPER;
+}
+// le tessere non devono rivelare quale blocco va all'inizio: niente maiuscola iniziale, salvo i nomi propri
+function tileCase(c){
+  const w = c.split(" ")[0];
+  return properWords().has(w) ? c : c.charAt(0).toLowerCase() + c.slice(1);
+}
+const woSet = (id) => ORDER_SETS.find(x => x.id === id);
+function woItem(setId, i){
+  const st = woSet(setId), x = st.items[i];
+  return {t:"order", wo:true, q:x.it, a:x.a, tiles:x.a.map(tileCase), alt:x.alt || [], start:x.start || 0, v:x.v || [], f:x.f || [],
+    lv:st.lv, lf:st.lf, e:x.e, rule:st.rule, setTitle:st.t, say:x.a.join(" ")};
+}
+// schema della frase giusta: in evidenza il verbo e ciò che gli sta attaccato
+function woDiagram(it){
+  const pills = it.a.map((c, k) => `<span class="wp ${it.v.includes(k) ? "pv" : it.f.includes(k) ? "pe" : ""}">${esc(c)}</span>`).join("");
+  const leg = [it.v.length ? `<span class="wl"><i class="pv"></i>${esc(it.lv)}</span>` : "", it.f.length ? `<span class="wl"><i class="pe"></i>${esc(it.lf)}</span>` : ""].join("");
+  return `<div class="wdiag"><span class="cl">Frase giusta</span><div class="wpills">${pills}</div><div class="wleg">${leg}</div></div>`;
+}
+function frasi(){
   screen({s:"frasi"});
-  if(openId) openPhr.add(openId);
+  const done = ORDER_SETS.filter(st => (S.wob[st.id] || 0) >= 80).length;
+  const next = ORDER_SETS.find(st => (S.wob[st.id] || 0) < 80);
   const v = $(`<div class="pop">
-    <div class="lesson-h"><span class="label">Frasario</span><h2>Frasi</h2></div>
-    ${sectionHero("wave", pick(["Beszélgessünk!", "Mondd utánam!", "Szia!"]), "Per parlare subito",
-      "Frasi pronte per ogni situazione", "Tocca una frase per sentirla (due volte: più lenta). Poi allenati a ricomporla con le tessere.")}
-    <div class="path" id="ph"></div>
+    <div class="lesson-h"><span class="label">Ordine delle parole</span><h2>Costruisci la frase</h2></div>
+    ${sectionHero(done ? "happy" : "wave", pick(["Rakd sorba!", "Gyerünk!", "Hajrá!"]), done + " serie su " + ORDER_SETS.length + " completate",
+      next ? esc(next.t) : "Tutte le serie completate",
+      "In ungherese conta cosa sta subito prima del verbo. Metti i blocchi nell'ordine giusto: dopo ogni risposta vedi lo schema della frase.",
+      `<button class="btn btn-lion" id="go">${next ? (S.wob[next.id] ? "Continua" : "Inizia") + " · " + esc(next.t) : "Ripeti la prima serie"}</button>`)}
+    <div id="wl"></div>
   </div>`);
-  const ph = v.querySelector("#ph");
-  PHRASES.forEach(set => {
-    const open = openPhr.has(set.id), best = S.fr[set.id] || 0;
-    const box = $(`<section class="grp ${open ? "open" : ""} ${best >= 80 ? "gdone" : ""}">
-      <button class="grp-h" aria-expanded="${open}">
-        <span class="grp-t"><b>${esc(set.t)}</b><span>${esc(set.s)}</span></span>
-        <span class="grp-r"><span class="grp-n">${best ? best + "%" : set.p.length + " frasi"}</span><span class="meter"><i style="width:${best}%"></i></span></span>
-        <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-      <div class="grp-b">
-        <div class="phr">${set.p.map(([hu, it, n]) => `<button class="vw ph" data-say="${esc(hu)}"><span class="ico">${ICON.sound}</span><span class="w"><b>${esc(hu)}</b><span class="m">${esc(it)}</span>${n ? `<span class="pn2">${esc(n)}</span>` : ""}</span></button>`).join("")}</div>
-        <button class="btn btn-lion ptrain">Allenati con queste frasi</button>
-      </div>
-    </section>`);
-    box.querySelector(".grp-h").onclick = () => {
-      if(openPhr.has(set.id)) openPhr.delete(set.id); else openPhr.add(set.id);
-      box.classList.toggle("open"); box.querySelector(".grp-h").setAttribute("aria-expanded", openPhr.has(set.id));
-    };
-    box.querySelectorAll(".ph").forEach(b => b.onclick = () => play(b.dataset.say));
-    box.querySelector(".ptrain").onclick = () => startPhrases(set.id);
-    ph.appendChild(box);
+  const wl = v.querySelector("#wl");
+  WO_GROUPS.forEach(([g, ids]) => {
+    wl.appendChild($(`<div class="sec-h"><h3>${esc(g)}</h3></div>`));
+    const box = $(`<div class="decks"></div>`);
+    ids.forEach(id => {
+      const st = woSet(id); if(!st) return;
+      const best = S.wob[id] || 0, n = unitIndex(st.unit) + 1;
+      const b = $(`<button class="deck ${best >= 80 ? "wdone" : ""}">
+        <span class="dt"><b>${esc(st.t)}</b><span>${esc(st.s)}</span>
+          <span class="label">${best >= 80 ? "✓ " + best + "%" : best ? best + "%" : "nuova"} · ${st.items.length} frasi${n ? " · unità " + n : ""}</span></span>
+        <span class="meter"><i style="width:${best}%"></i></span>
+      </button>`);
+      b.onclick = () => startWo(id);
+      box.appendChild(b);
+    });
+    wl.appendChild(box);
   });
+  v.querySelector("#go").onclick = () => startWo((next || ORDER_SETS[0]).id);
   v.appendChild(tabBar("frasi"));
   mount(v);
-  if(openId){ const el = [...v.querySelectorAll(".grp")][PHRASES.findIndex(p => p.id === openId)]; if(el) try{ el.scrollIntoView({block:"start"}); }catch(e){} }
 }
-// ogni frase diventa un esercizio "traduci con le tessere"; distrattori presi dalle altre frasi della situazione
-function startPhrases(id){
-  const set = phraseSet(id);
-  const usable = set.p.map((p, i) => ({p, i})).filter(x => L.tokens(x.p[0]).length > 1);
-  const list = shuffle(usable).slice(0, 8).map(({p, i}) => {
-    const words = L.tokens(p[0]), have = new Set(words.map(w => w.toLowerCase()));
-    const pool = Array.from(new Set(set.p.flatMap(q => L.tokens(q[0])))).filter(w => !have.has(w.toLowerCase()));
-    return {u:null, i, p:true, it:{t:"tr", q:p[1], a:[p[0]], x:shuffle(pool).slice(0, 3), e:p[2] ? esc(p[2]) : "", say:p[0]}};
-  });
-  begin("phr", null, list, id, "frasi");
+function startWo(id){
+  const list = shuffle(woSet(id).items.map((x, i) => ({set:id, i, w:true, it:woItem(id, i)})));
+  begin("wo", null, list, id, "frasi");
+}
+function woFinish(){
+  const pct = Math.round(R.first / R.total * 100), id = R.block;
+  S.wob[id] = Math.max(S.wob[id] || 0, pct);
+  S.xp += R.xp;
+  const t = today();
+  if(S.last !== t){ const y = new Date(); y.setDate(y.getDate() - 1); S.streak = (S.last === today(y)) ? S.streak + 1 : 1; S.last = t; }
+  save();
+  const order = [].concat(...WO_GROUPS.map(g => g[1]));
+  const nextId = order[order.indexOf(id) + 1];
+  const st = woSet(id), nx = nextId && woSet(nextId);
+  const v = $(`<div class="res pop">
+    ${mascot(pct >= 80 ? "cheer" : pct >= 50 ? "happy" : "sad", 130)}
+    <span class="label">Costruisci la frase · ${esc(st.t)}</span>
+    <div class="score">${R.first}<small>/${R.total}</small></div>
+    <p>${pct === 100 ? "Ordine perfetto." : pct >= 80 ? "Ottimo: la regola è tua." : pct >= 50 ? "Ci sei quasi. Riguarda lo schema della frase e riprova." : "Apri «Regola» durante l'esercizio e riprova."}</p>
+    <span class="xpgain">+${R.xp} XP · ${S.streak} ${S.streak === 1 ? "giorno" : "giorni"} di fila</span>
+    <div class="row">
+      ${pct >= 80 && nx ? `<button class="btn btn-lion" id="nextw">Prossima serie · ${esc(nx.t)}</button>` : ""}
+      <button class="btn ${pct >= 80 && nx ? "btn-ghost" : "btn-lion"}" id="againw">Rifai la serie</button>
+      ${S.wrong.length ? `<button class="btn btn-ghost" id="rv">Ripassa gli errori (${S.wrong.length})</button>` : ""}
+      <button class="btn btn-ghost" id="wl">Tutte le serie</button>
+    </div>
+  </div>`);
+  const on = (sel, fn) => { const b = v.querySelector(sel); if(b) b.onclick = fn; };
+  on("#nextw", () => startWo(nextId));
+  on("#againw", () => startWo(id));
+  on("#rv", startReview);
+  on("#wl", frasi);
+  mount(v);
 }
 
 /* ---------- montaggio e tastiera ---------- */
